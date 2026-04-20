@@ -106,10 +106,10 @@ const Dashboard = () => {
 
       const [resProfil, resClasses, resSessions, resEtudiants] =
         await Promise.all([
-          axios.get("http://127.0.0.1:8000/professeur/me", { headers }),
-          axios.get("http://127.0.0.1:8000/classes/", { headers }),
-          axios.get("http://127.0.0.1:8000/sessions/toutes", { headers }),
-          axios.get("http://127.0.0.1:8000/etudiants/tous", { headers }),
+          axios.get("https://profmanager.onrender.com/professeur/me", { headers }),
+          axios.get("https://profmanager.onrender.com/classes/", { headers }),
+          axios.get("https://profmanager.onrender.com/sessions/toutes", { headers }),
+          axios.get("https://profmanager.onrender.com/etudiants/tous", { headers }),
         ]);
 
       setProfil(resProfil.data);
