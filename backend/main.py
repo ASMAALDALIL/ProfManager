@@ -29,11 +29,16 @@ app = FastAPI(
     description="Système bilingue de gestion scolaire avec IA prédictive",
     version="1.5.0"
 )
-
+origins = [
+    "http://localhost:5173",
+    "https://profmanager-8afd3.web.app",
+    "https://profmanager-8afd3.firebaseapp.com",
+    "*" # Le joker "*" autorise TOUS les navigateurs (Chrome, Safari, etc.)
+]
 # CONFIGURATION CORS (Indispensable pour le bilingue et le Front)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://profmanager-8afd3.web.app"], 
+    allow_origins=origins, 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
