@@ -18,12 +18,12 @@ const GestionEtudiants = () => {
       try {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
-        const resClasses = await axios.get("http://127.0.0.1:8000/classes/", {
+        const resClasses = await axios.get("https://profmanager.onrender.com/classes/", {
           headers,
         });
         setClasses(resClasses.data);
         const resEtud = await axios.get(
-          "http://127.0.0.1:8000/etudiants/tous",
+          "https://profmanager.onrender.com/etudiants/tous",
           { headers },
         );
         setEtudiants(resEtud.data);
@@ -41,7 +41,7 @@ const GestionEtudiants = () => {
     if (window.confirm(confirmMsg)) {
       try {
         const token = localStorage.getItem("token");
-        await axios.delete(`http://127.0.0.1:8000/etudiants/${id}`, {
+        await axios.delete(`https://profmanager.onrender.com/etudiants/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setEtudiants(etudiants.filter((e) => e.id !== id));
