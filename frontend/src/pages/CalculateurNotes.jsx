@@ -26,7 +26,7 @@ const CalculateurNotes = () => {
   const fetchClasses = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://127.0.0.1:8000/classes/", {
+      const res = await axios.get("https://profmanager.onrender.com/classes/", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setClasses(res.data);
@@ -45,12 +45,12 @@ const CalculateurNotes = () => {
         "Accept-Language": i18n.language,
       };
       await axios.post(
-        `http://127.0.0.1:8000/bilans/generer-classe/${selectedClasse}?semestre=${selectedSemestre}`,
+        `https://profmanager.onrender.com/bilans/generer-classe/${selectedClasse}?semestre=${selectedSemestre}`,
         {},
         { headers },
       );
       const res = await axios.get(
-        `http://127.0.0.1:8000/export/bilans-excel/${selectedClasse}?json=true&semestre=${selectedSemestre}`,
+        `https://profmanager.onrender.com/export/bilans-excel/${selectedClasse}?json=true&semestre=${selectedSemestre}`,
         { headers },
       );
       setBilans(Array.isArray(res.data) ? res.data : []);
@@ -66,7 +66,7 @@ const CalculateurNotes = () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        `http://127.0.0.1:8000/export/bilans-excel/${selectedClasse}?semestre=${selectedSemestre}&langue=${i18n.language}`,
+        `https://profmanager.onrender.com/export/bilans-excel/${selectedClasse}?semestre=${selectedSemestre}&langue=${i18n.language}`,
         { headers: { Authorization: `Bearer ${token}` }, responseType: "blob" },
       );
       const url = window.URL.createObjectURL(new Blob([res.data]));
@@ -90,7 +90,7 @@ const CalculateurNotes = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://127.0.0.1:8000/bilans/modifier/${currentBilan.id}`,
+        `https://profmanager.onrender.com/bilans/modifier/${currentBilan.id}`,
         {
           note_finale: parseFloat(editForm.note_finale),
           remarque_finale: editForm.remarque_finale,
