@@ -35,11 +35,11 @@ const GestionClasses = () => {
       const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
       const [resClasses, resNiveaux, resCycles] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/classes/", { headers }),
-        axios.get(`http://127.0.0.1:8000/niveaux/?lang=${i18n.language}`, {
+        axios.get("https://profmanager.onrender.com/classes/", { headers }),
+        axios.get(`https://profmanager.onrender.com/niveaux/?lang=${i18n.language}`, {
           headers,
         }),
-        axios.get(`http://127.0.0.1:8000/cycles/?lang=${i18n.language}`, {
+        axios.get(`https://profmanager.onrender.com/cycles/?lang=${i18n.language}`, {
           headers,
         }),
       ]);
@@ -51,7 +51,7 @@ const GestionClasses = () => {
       resClasses.data.forEach(async (cls) => {
         try {
           const res = await axios.get(
-            `http://127.0.0.1:8000/etudiants/classe/${cls.id}`,
+            `https://profmanager.onrender.com/etudiants/classe/${cls.id}`,
             { headers },
           );
           setCounts((prev) => ({ ...prev, [cls.id]: res.data.length }));
@@ -75,7 +75,7 @@ const GestionClasses = () => {
     if (!window.confirm(msg)) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://127.0.0.1:8000/classes/${id}`, {
+      await axios.delete(`https://profmanager.onrender.com/classes/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
@@ -87,7 +87,7 @@ const GestionClasses = () => {
   const handleExportAbs = async (classeId, mois = null) => {
     try {
       const token = localStorage.getItem("token");
-      let url = `http://127.0.0.1:8000/export/absences-excel/${classeId}?langue=${i18n.language}`;
+      let url = `https://profmanager.onrender.com/export/absences-excel/${classeId}?langue=${i18n.language}`;
       if (mois) url += `&mois=${mois}`;
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -114,7 +114,7 @@ const GestionClasses = () => {
     setSelectedClasse(cls);
     try {
       const res = await axios.get(
-        `http://127.0.0.1:8000/etudiants/classe/${cls.id}`,
+        `https://profmanager.onrender.com/etudiants/classe/${cls.id}`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         },
