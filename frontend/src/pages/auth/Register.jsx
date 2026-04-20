@@ -26,7 +26,7 @@ const Register = () => {
     const fetchCycles = async () => {
       try {
         const res = await axios.get(
-          `http://127.0.0.1:8000/cycles/?lang=${i18n.language}`,
+          `https://profmanager.onrender.com/cycles/?lang=${i18n.language}`,
         );
         if (Array.isArray(res.data)) setCycles(res.data);
       } catch (err) {
@@ -40,7 +40,7 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://127.0.0.1:8000/auth/send-code", null, {
+      await axios.post("https://profmanager.onrender.com/auth/send-code", null, {
         params: { email: formData.email },
         headers: { "Accept-Language": i18n.language },
       });
@@ -54,7 +54,7 @@ const Register = () => {
 
   const handleVerifyCode = async () => {
     try {
-      await axios.post("http://127.0.0.1:8000/auth/verify-code", null, {
+      await axios.post("https://profmanager.onrender.com/auth/verify-code", null, {
         params: { email: formData.email, code: formData.code },
       });
       setStep(3);
@@ -66,7 +66,7 @@ const Register = () => {
   const handleFinalRegister = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://127.0.0.1:8000/auth/register", {
+      await axios.post("https://profmanager.onrender.com/auth/register", {
         ...formData,
         cycle_id: parseInt(formData.cycle_id),
       });
