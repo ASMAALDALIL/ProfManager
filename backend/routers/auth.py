@@ -68,17 +68,26 @@ async def send_verification_email(email: str, code: str):
     await fm.send_message(message)
 
 @router.post("/send-code")
-async def send_code(email: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+async def send_code(email: str, db: Session = Depends(get_db)):
+    # 1. Vérifier si l'utilisateur existe déjà
     user = db.query(Professeur).filter(Professeur.email == email).first()
     if user:
         raise HTTPException(status_code=400, detail="Cet email est déjà enregistré.")
     
+    # 2. Générer le code
     code = str(random.randint(1000, 9999))
     temp_db[email] = code
     
-    background_tasks.add_task(send_verification_email, email, code)
-    
-    return {"message": "Code envoyé avec succès"}
+    # 3. Envoyer l'email DIRECTEMENT (on attend qu'il soit envoyé)
+    try:
+        await send_verification_email(email, code)
+        return {"message": "Code envoyé avec succès"}
+    except Exception as e:
+        print(f"Erreur SMTP : {e}")
+        raise HTTPException(
+            status_code=500, 
+            detail="Erreur lors de l'envoi de l'email. Vérifiez la configuration SMTP."
+        )
 
 @router.post("/verify-code")
 async def verify_code(email: str, code: str):
