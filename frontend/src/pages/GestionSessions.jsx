@@ -18,11 +18,11 @@ const GestionSessions = () => {
       try {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
-        const resClasses = await axios.get("http://127.0.0.1:8000/classes/", {
+        const resClasses = await axios.get("https://profmanager.onrender.com/classes/", {
           headers,
         });
         const resSessions = await axios.get(
-          "http://127.0.0.1:8000/sessions/toutes",
+          "https://profmanager.onrender.com/sessions/toutes",
           { headers },
         );
         setClasses(resClasses.data);
