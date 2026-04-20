@@ -14,7 +14,7 @@ const Login = ({ setIsAuthenticated }) => {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "http://localhost:8000/auth/login",
+        "https://profmanager.onrender.com/auth/login",
         { email, mot_de_passe: password },
         { headers: { "Accept-Language": i18n.language } },
       );
