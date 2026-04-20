@@ -20,11 +20,11 @@ const ModifierClasse = () => {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
         const resNiveaux = await axios.get(
-          `http://127.0.0.1:8000/niveaux/?lang=${i18n.language}`, { headers }
+          `https://profmanager.onrender.com/niveaux/?lang=${i18n.language}`, { headers }
         );
         setNiveaux(resNiveaux.data);
         const resClasse = await axios.get(
-          `http://127.0.0.1:8000/classes/${id}`, { headers }
+          `https://profmanager.onrender.com/classes/${id}`, { headers }
         );
         setFormData({ nom: resClasse.data.nom, niveau_id: resClasse.data.niveau_id });
         setLoading(false);
@@ -44,7 +44,7 @@ const ModifierClasse = () => {
     if (selectedFile) data.append("file", selectedFile);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`http://127.0.0.1:8000/classes/${id}`, data, {
+      await axios.put(`https://profmanager.onrender.com/classes/${id}`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
