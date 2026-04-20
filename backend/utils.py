@@ -15,10 +15,15 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # --- Fonctions de Hachage ---
 def hash_password(password: str):
-    return pwd_context.hash(password)
+    # Correction : Bcrypt ne supporte pas plus de 72 octets.
+    # On encode en utf-8 et on tronque pour éviter l'erreur ValueError.
+    truncated_password = password.encode('utf-8')[:72]
+    return pwd_context.hash(truncated_password.decode('utf-8', errors='ignore'))
 
 def verify_password(plain_password: str, hashed_password: str):
-    return pwd_context.verify(plain_password, hashed_password)
+    # On applique la même troncature à la vérification
+    truncated_plain = plain_password.encode('utf-8')[:72]
+    return pwd_context.verify(truncated_plain.decode('utf-8', errors='ignore'), hashed_password)
 
 # --- Fonction JWT ---
 def create_access_token(data: dict):
