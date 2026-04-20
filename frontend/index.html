@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+
+    <!-- ── Viewport responsive ─────────────────────────── -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- ── PWA Meta Tags ───────────────────────────────── -->
+    <meta name="theme-color" content="#344C3D" />
+    <meta name="background-color" content="#f0f4f0" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="ProfManager" />
+    <meta name="application-name" content="ProfManager" />
+    <meta name="msapplication-TileColor" content="#344C3D" />
+    <meta name="msapplication-TileImage" content="/icons/icon-144.png" />
+
+    <!-- ── SEO / Description ───────────────────────────── -->
+    <meta name="description" content="Application de gestion de classes, étudiants et sessions pour professeurs." />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!-- ── Manifest PWA ────────────────────────────────── -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- ── Icônes Apple Touch ──────────────────────────── -->
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
+
+    <!-- ── Favicon standard ────────────────────────────── -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-96.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-72.png" />
+
+    <!-- ── Splash screens iPhone (optionnel) ───────────── -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+    <title>ProfManager</title>
+
+    <!-- ── Enregistrement du Service Worker ────────────── -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/service-worker.js")
+            .then((reg) => {
+              console.log("[PWA] Service Worker enregistré :", reg.scope);
+            })
+            .catch((err) => {
+              console.warn("[PWA] Échec de l'enregistrement :", err);
+            });
+        });
+      }
+    </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9959171100368043"
+    crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+    <noscript>ProfManager nécessite JavaScript pour fonctionner.</noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
