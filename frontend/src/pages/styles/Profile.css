@@ -1,0 +1,379 @@
+/* ============================================================
+   PROFILE.CSS — Sage Green Theme
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+.pf-page {
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  background: #f0f4f0;
+  padding: 2.5rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* ── Card ───────────────────────────────────────────────── */
+.pf-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 2.75rem 2.5rem;
+  width: 100%;
+  max-width: 640px;
+  border: 1px solid rgba(142,165,140,0.18);
+  box-shadow: 0 4px 28px rgba(52,76,61,0.09);
+  animation: pfSlideUp 0.5s cubic-bezier(0.23,1,0.32,1) both;
+}
+
+@keyframes pfSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header / Name ───────────────────────────────────────── */
+.pf-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 2.25rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid rgba(142,165,140,0.15);
+}
+
+.pf-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #e8f0e7;
+  border: 2px solid rgba(142,165,140,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.pf-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.75;
+}
+
+.pf-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #1e3329;
+  letter-spacing: -0.3px;
+  line-height: 1.1;
+}
+
+/* ── Grid layout ─────────────────────────────────────────── */
+.pf-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.4rem;
+  margin-bottom: 2rem;
+}
+
+.pf-field-full {
+  grid-column: 1 / -1;
+}
+
+/* ── Field ───────────────────────────────────────────────── */
+.pf-field-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8EA58C;
+  margin-bottom: 0.5rem;
+}
+.pf-field-label span:last-child {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.68rem;
+  color: rgba(142,165,140,0.7);
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 500;
+}
+
+.pf-info-box {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: #f7faf7;
+  border: 1px solid rgba(142,165,140,0.15);
+  color: #1e3329;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  min-height: 46px;
+  box-sizing: border-box;
+}
+
+.pf-info-box.bilingual {
+  gap: 0.5rem;
+}
+.pf-info-box.bilingual .pf-sep {
+  color: rgba(142,165,140,0.4);
+  font-weight: 300;
+}
+
+.pf-info-box.email {
+  font-size: 0.86rem;
+  color: #344C3D;
+}
+
+/* Password dots row */
+.pf-password-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.pf-password-row .pf-info-box {
+  flex: 1;
+  letter-spacing: 0.15em;
+  color: #8EA58C;
+}
+
+.pf-lock-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: #f7faf7;
+  border: 1px solid rgba(142,165,140,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.22s;
+  flex-shrink: 0;
+}
+.pf-lock-btn:hover { background: #344C3D; border-color: #344C3D; }
+.pf-lock-btn:hover svg { stroke: #BFCFBB; }
+.pf-lock-btn svg { width: 18px; height: 18px; stroke: #738A6E; fill: none; stroke-width: 1.8; transition: stroke 0.22s; }
+
+/* ── Input (edit mode) ───────────────────────────────────── */
+.pf-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: #f7faf7;
+  border: 1px solid rgba(142,165,140,0.2);
+  color: #1e3329;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.22s;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.pf-input::placeholder { color: #8EA58C; }
+.pf-input:focus { border-color: #8EA58C; background: #fff; box-shadow: 0 0 0 3px rgba(142,165,140,0.18); }
+
+select.pf-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238EA58C' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+select.pf-input option { background: #fff; color: #1e3329; }
+
+/* ── Footer buttons — CENTERED ───────────────────────────── */
+.pf-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(142,165,140,0.12);
+}
+
+.pf-btn-modify {
+  padding: 0.9rem 3rem;
+  border-radius: 12px;
+  background: #344C3D;
+  color: #BFCFBB;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all 0.22s;
+  box-shadow: 0 4px 18px rgba(52,76,61,0.28);
+  position: relative;
+  overflow: hidden;
+}
+.pf-btn-modify::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.pf-btn-modify:hover { background: #738A6E; transform: translateY(-1px); }
+
+.pf-btn-cancel {
+  padding: 0.9rem 2rem;
+  border-radius: 12px;
+  background: transparent;
+  color: #738A6E;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1.5px solid rgba(142,165,140,0.35);
+  cursor: pointer;
+  transition: all 0.22s;
+}
+.pf-btn-cancel:hover { background: #f0f4f0; border-color: #8EA58C; color: #344C3D; }
+
+.pf-btn-save {
+  padding: 0.9rem 2rem;
+  border-radius: 12px;
+  background: #344C3D;
+  color: #BFCFBB;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all 0.22s;
+  box-shadow: 0 4px 18px rgba(52,76,61,0.28);
+  position: relative;
+  overflow: hidden;
+}
+.pf-btn-save::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.pf-btn-save:hover { background: #738A6E; transform: translateY(-1px); }
+
+/* ── Password modal ──────────────────────────────────────── */
+.pf-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30,51,41,0.45);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+  animation: pfOverlayIn 0.2s ease both;
+}
+@keyframes pfOverlayIn { from { opacity: 0; } to { opacity: 1; } }
+
+.pf-modal {
+  background: #fff;
+  border-radius: 24px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid rgba(142,165,140,0.18);
+  box-shadow: 0 8px 48px rgba(52,76,61,0.15);
+  animation: pfModalUp 0.3s cubic-bezier(0.23,1,0.32,1) both;
+}
+@keyframes pfModalUp { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+.pf-modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #1e3329;
+  margin-bottom: 1.75rem;
+  letter-spacing: -0.3px;
+}
+
+.pf-modal-form { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.pf-modal-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8EA58C;
+  margin-bottom: 0.45rem;
+}
+
+.pf-modal-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: #f7faf7;
+  border: 1px solid rgba(142,165,140,0.2);
+  color: #1e3329;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.22s;
+  box-sizing: border-box;
+}
+.pf-modal-input:focus { border-color: #8EA58C; background: #fff; box-shadow: 0 0 0 3px rgba(142,165,140,0.18); }
+
+.pf-modal-footer {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.pf-modal-btn-cancel {
+  flex: 1;
+  padding: 0.9rem;
+  border-radius: 12px;
+  background: transparent;
+  color: #738A6E;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1.5px solid rgba(142,165,140,0.35);
+  cursor: pointer;
+  transition: all 0.22s;
+}
+.pf-modal-btn-cancel:hover { background: #f0f4f0; border-color: #8EA58C; color: #344C3D; }
+
+.pf-modal-btn-save {
+  flex: 1;
+  padding: 0.9rem;
+  border-radius: 12px;
+  background: #344C3D;
+  color: #BFCFBB;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all 0.22s;
+  box-shadow: 0 4px 18px rgba(52,76,61,0.28);
+}
+.pf-modal-btn-save:hover { background: #738A6E; transform: translateY(-1px); }
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .pf-page { padding: 1.25rem; }
+  .pf-card { padding: 1.75rem 1.25rem; }
+  .pf-grid { grid-template-columns: 1fr; }
+  .pf-field-full { grid-column: 1; }
+  .pf-footer { flex-direction: column; }
+}

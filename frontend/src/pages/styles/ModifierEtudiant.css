@@ -1,0 +1,151 @@
+/* ============================================================
+   MODIFIERETUDIANT.CSS — Sage Green Theme
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+.me-page {
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  background: #f0f4f0;
+  padding: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Card ───────────────────────────────────────────────── */
+.me-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 2.75rem 2.5rem;
+  width: 100%;
+  max-width: 500px;
+  border: 1px solid rgba(142,165,140,0.18);
+  box-shadow: 0 4px 28px rgba(52,76,61,0.09);
+  animation: meSlideUp 0.5s cubic-bezier(0.23,1,0.32,1) both;
+}
+
+@keyframes meSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.me-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e3329;
+  margin-bottom: 2rem;
+  letter-spacing: -0.3px;
+}
+
+/* ── Form ───────────────────────────────────────────────── */
+.me-form { display: flex; flex-direction: column; gap: 1.4rem; }
+
+.me-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8EA58C;
+  margin-bottom: 0.5rem;
+}
+
+.me-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: #f7faf7;
+  border: 1px solid rgba(142,165,140,0.2);
+  color: #1e3329;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.22s;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.me-input::placeholder { color: #8EA58C; font-size: 0.88rem; }
+.me-input:focus { border-color: #8EA58C; background: #fff; box-shadow: 0 0 0 3px rgba(142,165,140,0.18); }
+
+select.me-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238EA58C' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+select.me-input option { background: #fff; color: #1e3329; }
+
+/* ── Loading ─────────────────────────────────────────────── */
+.me-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f4f0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  color: #738A6E;
+  font-weight: 600;
+}
+
+/* ── Footer buttons ──────────────────────────────────────── */
+.me-footer {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.me-btn-cancel {
+  flex: 1;
+  padding: 0.9rem;
+  border-radius: 12px;
+  background: transparent;
+  color: #738A6E;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1.5px solid rgba(142,165,140,0.35);
+  cursor: pointer;
+  transition: all 0.22s;
+}
+.me-btn-cancel:hover { background: #f0f4f0; border-color: #8EA58C; color: #344C3D; }
+
+.me-btn-submit {
+  flex: 1;
+  padding: 0.9rem;
+  border-radius: 12px;
+  background: #344C3D;
+  color: #BFCFBB;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all 0.22s;
+  box-shadow: 0 4px 18px rgba(52,76,61,0.28);
+  position: relative;
+  overflow: hidden;
+}
+.me-btn-submit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.me-btn-submit:hover { background: #738A6E; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(52,76,61,0.35); }
+.me-btn-submit:active { transform: translateY(0); }
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .me-page { padding: 1.25rem; align-items: flex-start; }
+  .me-card { padding: 1.75rem 1.25rem; }
+}

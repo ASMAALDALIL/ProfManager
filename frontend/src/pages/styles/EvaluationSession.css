@@ -1,0 +1,217 @@
+/* ============================================================
+   EVALUATIONSESSION.CSS — Sage Green Theme
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+.ev-page {
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  background: #f0f4f0;
+  padding: 2.5rem;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.ev-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ev-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #1e3329;
+  letter-spacing: -0.4px;
+  line-height: 1.1;
+}
+
+.ev-btn-action {
+  padding: 0.75rem 2rem;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all 0.22s;
+  box-shadow: 0 4px 18px rgba(52,76,61,0.25);
+  position: relative;
+  overflow: hidden;
+}
+.ev-btn-action::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.ev-btn-action.save {
+  background: #344C3D;
+  color: #BFCFBB;
+}
+.ev-btn-action.save:hover { background: #738A6E; transform: translateY(-1px); }
+
+.ev-btn-action.edit {
+  background: #e07b3a;
+  color: #fff;
+}
+.ev-btn-action.edit:hover { background: #c96a2a; transform: translateY(-1px); }
+
+/* ── Search bar ──────────────────────────────────────────── */
+.ev-search-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.ev-search-inner {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+}
+
+.ev-search-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 1rem;
+  font-size: 15px;
+  color: #8EA58C;
+  pointer-events: none;
+}
+[dir="rtl"] .ev-search-icon { left: auto; right: 1rem; }
+
+.ev-search-input {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.75rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 1.5px solid rgba(142,165,140,0.25);
+  color: #1e3329;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.22s;
+  box-sizing: border-box;
+  box-shadow: 0 2px 12px rgba(52,76,61,0.06);
+}
+.ev-search-input::placeholder { color: #8EA58C; }
+.ev-search-input:focus { border-color: #8EA58C; box-shadow: 0 0 0 3px rgba(142,165,140,0.18), 0 2px 12px rgba(52,76,61,0.06); }
+[dir="rtl"] .ev-search-input { padding: 0.85rem 2.75rem 0.85rem 1rem; }
+
+/* ── Table card ──────────────────────────────────────────── */
+.ev-table-card {
+  background: #fff;
+  border-radius: 22px;
+  border: 1px solid rgba(142,165,140,0.18);
+  box-shadow: 0 2px 20px rgba(52,76,61,0.07);
+  overflow: hidden;
+}
+
+.ev-table-scroll {
+  overflow-y: auto;
+  max-height: 62vh;
+}
+.ev-table-scroll::-webkit-scrollbar { width: 5px; }
+.ev-table-scroll::-webkit-scrollbar-thumb { background: rgba(142,165,140,0.3); border-radius: 99px; }
+
+.ev-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ev-table thead tr { background: #f7faf7; }
+.ev-table thead th {
+  padding: 1rem 1.1rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8EA58C;
+  text-align: center;
+  border-bottom: 1px solid rgba(142,165,140,0.12);
+  position: sticky;
+  top: 0;
+  background: #f7faf7;
+  z-index: 1;
+}
+
+.ev-table tbody tr {
+  border-bottom: 1px solid rgba(142,165,140,0.08);
+  transition: background 0.15s;
+}
+.ev-table tbody tr:last-child { border-bottom: none; }
+.ev-table tbody tr:hover { background: #f7faf7; }
+.ev-table tbody tr.absent { opacity: 0.45; filter: grayscale(0.5); background: #fafafa; }
+
+.ev-table tbody td {
+  padding: 0.9rem 1.1rem;
+  text-align: center;
+  color: #344C3D;
+  font-size: 0.87rem;
+}
+
+.ev-student-name {
+  font-weight: 700;
+  color: #1e3329;
+  font-size: 0.9rem;
+}
+.ev-student-code {
+  font-size: 0.75rem;
+  color: #8EA58C;
+  margin-top: 2px;
+}
+
+/* ── Number inputs in table ──────────────────────────────── */
+.ev-num-input {
+  width: 60px;
+  padding: 0.5rem 0.4rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(142,165,140,0.25);
+  background: #f7faf7;
+  color: #1e3329;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  transition: all 0.2s;
+  box-sizing: border-box;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.ev-num-input::-webkit-inner-spin-button,
+.ev-num-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.ev-num-input:focus { border-color: #8EA58C; background: #fff; box-shadow: 0 0 0 3px rgba(142,165,140,0.18); }
+.ev-num-input:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Checkbox ────────────────────────────────────────────── */
+.ev-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #344C3D;
+  cursor: pointer;
+}
+.ev-checkbox:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Empty state ─────────────────────────────────────────── */
+.ev-empty {
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #8EA58C;
+  font-size: 0.9rem;
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .ev-page { padding: 1.25rem; }
+  .ev-title { font-size: 1.7rem; }
+  .ev-table-scroll { max-height: 55vh; }
+}

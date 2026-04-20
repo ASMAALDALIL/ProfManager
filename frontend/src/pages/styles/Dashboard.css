@@ -1,0 +1,404 @@
+/* ============================================================
+   DASHBOARD.CSS — Sage Green Theme
+   Cohérent avec Login.css / Register.css / Sidebar.css
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+/* ── Page wrapper ───────────────────────────────────────── */
+.dashboard-page {
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  background: #f0f4f0;
+  padding: 2.5rem 2.5rem 2.5rem 2.5rem;
+  position: relative;
+}
+
+/* ── Greeting section ───────────────────────────────────── */
+.dashboard-greeting {
+  margin-bottom: 2.5rem;
+  margin-top: 0.5rem;
+}
+
+.dashboard-greeting-sub {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #131613;
+  margin-bottom: 0.35rem;
+}
+
+.dashboard-greeting-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #1e3329;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+
+.dashboard-greeting-name span {
+  color: #8EA58C;
+}
+
+.dashboard-greeting-date {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: #738A6E;
+  font-weight: 400;
+}
+
+/* ── Stats grid ─────────────────────────────────────────── */
+.dashboard-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+@media (max-width: 900px) {
+  .dashboard-stats-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Stat card ──────────────────────────────────────────── */
+.dash-stat-card {
+  background: white;
+  border-radius: 22px;
+  padding: 1.75rem 1.75rem 1.5rem;
+  border: 1px solid rgba(142,165,140,0.15);
+  box-shadow: 0 2px 20px rgba(52,76,61,0.06);
+  cursor: pointer;
+  transition: all 0.28s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dash-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 22px 22px 0 0;
+  background: linear-gradient(90deg, var(--card-color-a), var(--card-color-b));
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.dash-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(52,76,61,0.12);
+  border-color: rgba(142,165,140,0.3);
+}
+
+.dash-stat-card:hover::before {
+  opacity: 1;
+}
+
+.dash-stat-card:active {
+  transform: translateY(-2px);
+}
+
+/* Card accent colors */
+.dash-stat-card.card-students {
+  --card-color-a: #8EA58C;
+  --card-color-b: #BFCFBB;
+}
+.dash-stat-card.card-classes {
+  --card-color-a: #738A6E;
+  --card-color-b: #8EA58C;
+}
+.dash-stat-card.card-sessions {
+  --card-color-a: #344C3D;
+  --card-color-b: #738A6E;
+}
+
+/* Card top row */
+.dash-stat-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dash-stat-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dash-stat-card.card-students .dash-stat-card-icon { background: #e8f0e7; }
+.dash-stat-card.card-classes  .dash-stat-card-icon { background: #dde8db; }
+.dash-stat-card.card-sessions .dash-stat-card-icon { background: #d2e0d0; }
+
+.dash-stat-card-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: #344C3D;
+  fill: none;
+  stroke-width: 1.6;
+}
+
+.dash-stat-card-arrow {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #f0f4f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.dash-stat-card:hover .dash-stat-card-arrow {
+  background: #344C3D;
+  transform: translateX(2px);
+}
+
+.dash-stat-card-arrow svg {
+  width: 14px;
+  height: 14px;
+  stroke: #738A6E;
+  fill: none;
+  stroke-width: 2;
+  transition: stroke 0.2s;
+}
+
+.dash-stat-card:hover .dash-stat-card-arrow svg {
+  stroke: white;
+}
+
+/* Card value */
+.dash-stat-card-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: #1e3329;
+  line-height: 1;
+  margin-bottom: 0.85rem;
+}
+
+/* Card label */
+.dash-stat-card-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8EA58C;
+  margin-top: -0.25rem;
+}
+
+/* ── Sessions section ───────────────────────────────────── */
+.dashboard-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.dashboard-section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1e3329;
+  letter-spacing: -0.3px;
+}
+
+.dashboard-new-session-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 999px;
+  background: #344C3D;
+  color: #BFCFBB;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border: none;
+  cursor: pointer;
+  transition: all 0.22s;
+  box-shadow: 0 4px 16px rgba(52,76,61,0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-new-session-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.dashboard-new-session-btn:hover {
+  background: #738A6E;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(52,76,61,0.3);
+}
+
+.dashboard-new-session-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+}
+
+/* ── Sessions table card ────────────────────────────────── */
+.dashboard-table-card {
+  background: white;
+  border-radius: 22px;
+  border: 1px solid rgba(142,165,140,0.15);
+  box-shadow: 0 2px 20px rgba(52,76,61,0.06);
+  overflow: hidden;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dashboard-table thead tr {
+  background: #f7faf7;
+}
+
+.dashboard-table thead th {
+  padding: 1rem 1.25rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8EA58C;
+  text-align: center;
+  border-bottom: 1px solid rgba(142,165,140,0.12);
+}
+
+.dashboard-table thead th:first-child { text-align: left; }
+
+.dashboard-table tbody tr {
+  border-bottom: 1px solid rgba(142,165,140,0.08);
+  transition: background 0.15s;
+}
+
+.dashboard-table tbody tr:last-child { border-bottom: none; }
+
+.dashboard-table tbody tr:hover { background: #f7faf7; }
+
+.dashboard-table tbody td {
+  padding: 1rem 1.25rem;
+  font-size: 0.87rem;
+  color: #344C3D;
+  text-align: center;
+}
+
+.dashboard-table tbody td:first-child {
+  text-align: left;
+  font-weight: 600;
+  color: #1e3329;
+}
+
+.dash-badge {
+  display: inline-block;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #e8f0e7;
+  color: #344C3D;
+  letter-spacing: 0.04em;
+}
+
+.dash-time {
+  font-variant-numeric: tabular-nums;
+  color: #738A6E;
+  font-size: 0.82rem;
+}
+
+.dash-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #344C3D;
+  background: #e8f0e7;
+  border: none;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-decoration: none;
+}
+
+.dash-action-btn:hover {
+  background: #344C3D;
+  color: #BFCFBB;
+}
+
+/* ── Empty state ────────────────────────────────────────── */
+.dashboard-empty {
+  padding: 4rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dashboard-empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: #e8f0e7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-empty-icon svg {
+  width: 30px;
+  height: 30px;
+  stroke: #8EA58C;
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.dashboard-empty-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #344C3D;
+}
+
+.dashboard-empty-sub {
+  font-size: 0.82rem;
+  color: #8EA58C;
+  max-width: 280px;
+  line-height: 1.6;
+}
+
+/* ── Loading skeleton ───────────────────────────────────── */
+.dash-skeleton {
+  background: linear-gradient(90deg, #e8f0e7 25%, #d2e0d0 50%, #e8f0e7 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── RTL support ────────────────────────────────────────── */
+[dir="rtl"] .dashboard-table thead th:first-child { text-align: right; }
+[dir="rtl"] .dashboard-table tbody td:first-child  { text-align: right; }
