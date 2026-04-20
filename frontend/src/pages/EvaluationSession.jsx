@@ -21,13 +21,13 @@ const EvaluationSession = () => {
         const headers = { Authorization: `Bearer ${token}` };
 
         const resEtud = await axios.get(
-          `http://127.0.0.1:8000/etudiants/classe/${classeId}`,
+          `https://profmanager.onrender.com/etudiants/classe/${classeId}`,
           { headers },
         );
         setEtudiants(resEtud.data);
 
         const resEval = await axios.get(
-          `http://127.0.0.1:8000/evaluations/session/${sessionId}`,
+          `https://profmanager.onrender.com/evaluations/session/${sessionId}`,
           { headers },
         );
 
@@ -93,7 +93,7 @@ const EvaluationSession = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://127.0.0.1:8000/evaluations/save-session",
+        "https://profmanager.onrender.com/evaluations/save-session",
         {
           id_session: parseInt(sessionId),
           id_classe: parseInt(classeId),
