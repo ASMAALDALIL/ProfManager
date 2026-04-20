@@ -1,0 +1,191 @@
+/* ============================================================
+   APP.CSS — Styles globaux + responsive
+   ============================================================ */
+
+/* ── Overlay animation ──────────────────────────────────── */
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Hamburger button ───────────────────────────────────── */
+.topbar-hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(52, 76, 61, 0.12);
+  color: #344C3D;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.topbar-hamburger:hover {
+  background: rgba(52, 76, 61, 0.2);
+}
+
+/* ── Global box-sizing ──────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* ── Prevent horizontal overflow ────────────────────────── */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* ── Responsive: toutes les pages ──────────────────────── */
+
+/* Tablet (768px → 1024px) : réduire padding des pages */
+@media (max-width: 1024px) {
+  .gc-page,
+  .ac-page,
+  .ae-page,
+  .ds-page,
+  .ev-page,
+  .cn-page,
+  .dashboard-page {
+    padding: 1.75rem;
+  }
+}
+
+/* Mobile (< 768px) */
+@media (max-width: 768px) {
+  /* Réduire padding des pages */
+  .gc-page,
+  .ev-page,
+  .cn-page,
+  .dashboard-page {
+    padding: 1.25rem;
+  }
+
+  /* Pages centrées (formulaires) */
+  .ac-page,
+  .ae-page,
+  .ds-page {
+    padding: 1rem;
+    align-items: flex-start;
+    padding-top: 1.5rem;
+  }
+
+  /* Dashboard stats : 1 colonne */
+  .dashboard-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  /* Dashboard table : scroll horizontal */
+  .dashboard-table-card {
+    overflow-x: auto;
+  }
+  .dashboard-table {
+    min-width: 500px;
+  }
+
+  /* GestionClasses : 1 colonne */
+  .gc-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Titres */
+  .gc-title,
+  .cn-title,
+  .ev-title,
+  .dashboard-greeting-name {
+    font-size: 1.7rem;
+  }
+
+  /* Calculateur : controls en colonne */
+  .cn-controls-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cn-field-semestre { width: 100%; }
+  .cn-btn-calc { width: 100%; text-align: center; }
+
+  /* Calculateur table : scroll horizontal */
+  .cn-table-card {
+    overflow-x: auto;
+  }
+  .cn-table {
+    min-width: 600px;
+  }
+
+  /* Evaluation table : scroll horizontal */
+  .ev-table-card {
+    overflow-x: auto;
+  }
+  .ev-table {
+    min-width: 560px;
+  }
+
+  /* Cards formulaire : pleine largeur */
+  .ac-card,
+  .ae-card,
+  .ds-card {
+    max-width: 100%;
+    padding: 1.5rem 1rem;
+  }
+
+  /* Modals : pleine largeur */
+  .gc-modal,
+  .cn-modal {
+    max-width: 100%;
+    margin: 0;
+    border-radius: 18px;
+  }
+  .gc-modal-large {
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 18px;
+  }
+
+  /* Header pages */
+  .gc-header,
+  .cn-header,
+  .ev-header,
+  .dashboard-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  /* Pill semestre */
+  .ds-semestre-pills {
+    flex-direction: column;
+  }
+}
+
+/* Extra-small (< 480px) */
+@media (max-width: 480px) {
+  .gc-title,
+  .cn-title,
+  .ev-title,
+  .dashboard-greeting-name {
+    font-size: 1.4rem;
+  }
+
+  .lang-btn span {
+    display: none; /* Cacher le texte, garder juste l'icône globe */
+  }
+
+  /* Boutons : pleine largeur dans les footers */
+  .ac-footer,
+  .ae-footer,
+  .ds-footer {
+    flex-direction: column;
+  }
+
+  .gc-card-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .gc-months-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
