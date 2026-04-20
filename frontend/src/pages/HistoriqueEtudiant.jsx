@@ -18,11 +18,11 @@ const HistoriqueEtudiant = () => {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
         const resEtud = await axios.get(
-          `http://127.0.0.1:8000/etudiants/${etudiantId}`, { headers }
+          `https://profmanager.onrender.com/etudiants/${etudiantId}`, { headers }
         );
         setEtudiant(resEtud.data);
         const resHist = await axios.get(
-          `http://127.0.0.1:8000/evaluations/etudiant/${etudiantId}/historique`, { headers }
+          `https://profmanager.onrender.com/evaluations/etudiant/${etudiantId}/historique`, { headers }
         );
         setHistorique(resHist.data);
       } catch (err) {
