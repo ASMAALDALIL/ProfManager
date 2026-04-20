@@ -37,7 +37,7 @@ const Profile = () => {
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("token");
-      const profRes = await axios.get("http://127.0.0.1:8000/professeur/me", {
+      const profRes = await axios.get("https://profmanager.onrender.com/professeur/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUserData(profRes.data);
@@ -51,8 +51,8 @@ const Profile = () => {
 
       // Always fetch both languages so the cycle display is bilingual
       const [resFr, resAr] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/cycles/?lang=fr"),
-        axios.get("http://127.0.0.1:8000/cycles/?lang=ar"),
+        axios.get("https://profmanager.onrender.com/cycles/?lang=fr"),
+        axios.get("https://profmanager.onrender.com/cycles/?lang=ar"),
       ]);
       setCyclesList(
         resFr.data.map((f) => ({
@@ -64,7 +64,7 @@ const Profile = () => {
 
       if (profRes.data.cycle_id) {
         const cycleDetails = await axios.get(
-          `http://127.0.0.1:8000/cycles/${profRes.data.cycle_id}`,
+          `https://profmanager.onrender.com/cycles/${profRes.data.cycle_id}`,
         );
         setCycleNames({
           fr: formatText(cycleDetails.data.fr),
@@ -85,7 +85,7 @@ const Profile = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.put("http://127.0.0.1:8000/professeur/me", formData, {
+      await axios.put("https://profmanager.onrender.com/professeur/me", formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setIsEditing(false);
