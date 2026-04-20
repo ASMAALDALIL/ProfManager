@@ -26,7 +26,7 @@ const DemarrerSession = () => {
     const fetchClasses = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://127.0.0.1:8000/classes/", {
+        const res = await axios.get("https://profmanager.onrender.com/classes/", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setClasses(res.data);
@@ -44,7 +44,7 @@ const DemarrerSession = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       const resEtudiants = await axios.get(
-        `http://127.0.0.1:8000/etudiants/classe/${formData.id_classe}`,
+        `https://profmanager.onrender.com/etudiants/classe/${formData.id_classe}`,
         { headers },
       );
 
@@ -58,7 +58,7 @@ const DemarrerSession = () => {
       }
 
       const res = await axios.post(
-        "http://127.0.0.1:8000/sessions/",
+        "https://profmanager.onrender.com/sessions/",
         {
           ...formData,
           id_classe: parseInt(formData.id_classe),
