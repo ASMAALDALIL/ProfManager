@@ -18,12 +18,12 @@ const AjouterClasse = () => {
       try {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
-        const profRes = await axios.get("http://127.0.0.1:8000/professeur/me", {
+        const profRes = await axios.get("https://profmanager.onrender.com/professeur/me", {
           headers,
         });
         setCycleProf(profRes.data.cycle_id);
         const resNiveaux = await axios.get(
-          `http://127.0.0.1:8000/niveaux/?lang=${i18n.language}`,
+          `https://profmanager.onrender.com/niveaux/?lang=${i18n.language}`,
           { headers },
         );
         setNiveaux(
@@ -47,7 +47,7 @@ const AjouterClasse = () => {
     data.append("file", selectedFile);
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://127.0.0.1:8000/classes/", data, {
+      await axios.post("https://profmanager.onrender.com/classes/", data, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
