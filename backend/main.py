@@ -33,7 +33,6 @@ origins = [
     "http://localhost:5173",
     "https://profmanager-8afd3.web.app",
     "https://profmanager-8afd3.firebaseapp.com",
-    "*" # Le joker "*" autorise TOUS les navigateurs (Chrome, Safari, etc.)
 ]
 # CONFIGURATION CORS (Indispensable pour le bilingue et le Front)
 app.add_middleware(
