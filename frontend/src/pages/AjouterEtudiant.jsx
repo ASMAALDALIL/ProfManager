@@ -19,7 +19,7 @@ const AjouterEtudiant = () => {
     const fetchClasses = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://127.0.0.1:8000/classes/", {
+        const res = await axios.get("https://profmanager.onrender.com/classes/", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setClasses(res.data);
@@ -34,7 +34,7 @@ const AjouterEtudiant = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://127.0.0.1:8000/etudiants/", formData, {
+      await axios.post("https://profmanager.onrender.com/etudiants/", formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/etudiants");
