@@ -1,6 +1,6 @@
 # 🎓 ProfManager
 
-**ProfManager** est une application Full-Stack innovante destinée à simplifier la gestion pédagogique des enseignants. Ce projet fait partie de mon parcours académique (BTS/ENSA) et intègre des technologies modernes pour répondre aux besoins du secteur éducatif.
+**ProfManager** est une application Full-Stack innovante destinée à simplifier la gestion pédagogique des enseignants. Ce projet fait partie de mon parcours académique (ENSA) et intègre des technologies modernes pour répondre aux besoins du secteur éducatif.
 
 ## 🚀 Fonctionnalités
 * **Gestion des étudiants** : Suivi des absences, comportement et participations.
