@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./Login.css";
@@ -13,23 +13,23 @@ const Login = ({ setIsAuthenticated }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(
-        "https://profmanager.onrender.com/auth/login",
+      const cleanLang = i18n.language?.startsWith("ar") ? "ar" : "fr";
+      const res = await api.post(
+        "auth/login",
         { email, mot_de_passe: password },
-        { headers: { "Accept-Language": i18n.language } },
+        { headers: { "Accept-Language": cleanLang } }
       );
       localStorage.setItem("token", res.data.access_token);
       setIsAuthenticated(true);
       navigate("/dashboard");
     } catch (err) {
-      alert(err.response?.data?.detail || "Erreur");
+      alert(err.response?.data?.detail || "Erreur de connexion");
     }
   };
 
   return (
     <div className="login-page">
       <div className="login-card">
-        {/* Avatar icon */}
         <div className="login-avatar">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -42,20 +42,20 @@ const Login = ({ setIsAuthenticated }) => {
 
         <h1 className="login-title">ProfManager</h1>
         <p className="login-subtitle">
-          {i18n.language === "ar" ? "تسجيل الدخول" : "Connexion"}
+          {i18n.language?.startsWith("ar") ? "تسجيل الدخول" : "Connexion"}
         </p>
 
         <form
           onSubmit={handleLogin}
           className="login-form"
-          dir={i18n.language === "ar" ? "rtl" : "ltr"}
+          dir={i18n.language?.startsWith("ar") ? "rtl" : "ltr"}
         >
-          {/* Email */}
           <div className="login-field-wrapper">
             <input
               type="email"
               placeholder={t("email")}
               className="login-input"
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
@@ -68,12 +68,12 @@ const Login = ({ setIsAuthenticated }) => {
             </svg>
           </div>
 
-          {/* Password */}
           <div className="login-field-wrapper">
             <input
               type="password"
               placeholder={t("password")}
               className="login-input"
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />

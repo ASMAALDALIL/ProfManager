@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./styles/DemarrerSession.css";
@@ -26,7 +26,7 @@ const DemarrerSession = () => {
     const fetchClasses = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("https://profmanager.onrender.com/classes/", {
+        const res = await api.get("classes/", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setClasses(res.data);
@@ -43,8 +43,8 @@ const DemarrerSession = () => {
       const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
 
-      const resEtudiants = await axios.get(
-        `https://profmanager.onrender.com/etudiants/classe/${formData.id_classe}`,
+      const resEtudiants = await api.get(
+        `etudiants/classe/${formData.id_classe}`,
         { headers },
       );
 
@@ -57,8 +57,8 @@ const DemarrerSession = () => {
         return;
       }
 
-      const res = await axios.post(
-        "https://profmanager.onrender.com/sessions/",
+      const res = await api.post(
+        "sessions/",
         {
           ...formData,
           id_classe: parseInt(formData.id_classe),

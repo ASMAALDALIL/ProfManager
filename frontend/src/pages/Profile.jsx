@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { useTranslation } from "react-i18next";
 import "./styles/Profile.css";
 
@@ -37,7 +37,7 @@ const Profile = () => {
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("token");
-      const profRes = await axios.get("https://profmanager.onrender.com/professeur/me", {
+      const profRes = await api.get("professeur/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUserData(profRes.data);
@@ -51,8 +51,8 @@ const Profile = () => {
 
       // Always fetch both languages so the cycle display is bilingual
       const [resFr, resAr] = await Promise.all([
-        axios.get("https://profmanager.onrender.com/cycles/?lang=fr"),
-        axios.get("https://profmanager.onrender.com/cycles/?lang=ar"),
+        api.get("cycles/?lang=fr"),
+        api.get("cycles/?lang=ar"),
       ]);
       setCyclesList(
         resFr.data.map((f) => ({
@@ -63,8 +63,8 @@ const Profile = () => {
       );
 
       if (profRes.data.cycle_id) {
-        const cycleDetails = await axios.get(
-          `https://profmanager.onrender.com/cycles/${profRes.data.cycle_id}`,
+        const cycleDetails = await api.get(
+          `cycles/${profRes.data.cycle_id}`,
         );
         setCycleNames({
           fr: formatText(cycleDetails.data.fr),
@@ -85,7 +85,7 @@ const Profile = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.put("https://profmanager.onrender.com/professeur/me", formData, {
+      await api.put("professeur/me", formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setIsEditing(false);
@@ -106,8 +106,8 @@ const Profile = () => {
     }
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
-        "http://127.0.0.1:8000/professeur/me/password",
+      await api.put(
+        "professeur/me/password",
         {
           old_password: passwords.old_password,
           new_password: passwords.new_password,

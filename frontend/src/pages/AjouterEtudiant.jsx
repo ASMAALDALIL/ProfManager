@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./styles/AjouterEtudiant.css";
@@ -19,7 +19,7 @@ const AjouterEtudiant = () => {
     const fetchClasses = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("https://profmanager.onrender.com/classes/", {
+        const res = await api.get("classes/", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setClasses(res.data);
@@ -34,7 +34,7 @@ const AjouterEtudiant = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.post("https://profmanager.onrender.com/etudiants/", formData, {
+      await api.post("etudiants/", formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/etudiants");

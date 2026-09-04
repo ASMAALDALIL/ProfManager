@@ -1,19 +1,80 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-from sqlalchemy import func, extract, and_
+from sqlalchemy import extract, and_
 import pandas as pd
 import io
+from typing import Optional
+import re
+import json
+import urllib.parse
+import urllib.request
+from deep_translator import MyMemoryTranslator
+
 from database import get_db
 from models.etudiant import Etudiant
 from models.evaluation import Evaluation
 from models.session import Session as SessionModel
 from models.bilan_semestriels import BilanSemestriel
-from .auth import get_current_user
 from models.professeur import Professeur
-from typing import Optional
+from .auth import get_current_user
 
 router = APIRouter(prefix="/export", tags=["Exportation"])
+
+
+# ---------- UTILS TRADUCTION ROBUSTE ----------
+
+def traduire_texte(texte: str, src: str, dest: str) -> str:
+    """Traduit via l'endpoint Google avec en-tête navigateur, et fallback sur MyMemory."""
+    # Nettoyer les ponctuations combinées bizarres qui font échouer les traducteurs
+    texte_clean = re.sub(r'[\.,;:\s]+', ' ', texte).strip()
+    if not texte_clean:
+        return texte
+
+    # Tentative 1 : Google Translate direct avec User-Agent valide
+    try:
+        url = (
+            "https://translate.googleapis.com/translate_a/single?client=gtx"
+            f"&sl={src}&tl={dest}&dt=t&q=" + urllib.parse.quote(texte)
+        )
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            res_json = json.loads(response.read().decode('utf-8'))
+            traduction = "".join([partie[0] for partie in res_json[0] if partie[0]])
+            if traduction:
+                return traduction.strip()
+    except Exception as e:
+        print(f"Fallback vers MyMemory suite à : {e}")
+
+    # Tentative 2 : MyMemory Translator (très robuste ar <-> fr)
+    try:
+        trad = MyMemoryTranslator(source=src, target=dest).translate(texte)
+        if trad:
+            return trad.strip()
+    except Exception as e:
+        print(f"Échec MyMemory : {e}")
+
+    return texte
+
+
+def harmoniser_remarque(texte: str, langue_cible: str) -> str:
+    """Traduit automatiquement la remarque vers 'fr' ou 'ar' si la langue ne correspond pas."""
+    if not texte or not str(texte).strip():
+        return ""
+    
+    texte_str = str(texte).strip()
+    contient_arabe = bool(re.search(r'[\u0600-\u06FF]', texte_str))
+    
+    # Si on veut du français mais le texte saisi est en arabe
+    if langue_cible == "fr" and contient_arabe:
+        return traduire_texte(texte_str, src="ar", dest="fr")
+    
+    # Si on veut de l'arabe mais le texte saisi est en français
+    if langue_cible == "ar" and not contient_arabe:
+        return traduire_texte(texte_str, src="fr", dest="ar")
+        
+    return texte_str
+
 
 # ---------- EXPORT ABSENCES ----------
 
@@ -21,7 +82,7 @@ router = APIRouter(prefix="/export", tags=["Exportation"])
 async def export_absences_excel(
     classe_id: int, 
     mois: Optional[int] = Query(None, ge=1, le=12), 
-    langue: str = Query("fr", regex="^(fr|ar)$"), 
+    langue: str = Query("fr", pattern="^(fr|ar)$"), 
     db: Session = Depends(get_db),
     current_user: Professeur = Depends(get_current_user)
 ):
@@ -50,9 +111,12 @@ async def export_absences_excel(
         for s in sessions:
             col_name = s.date_session.strftime("%d/%m")
             status = eval_map.get((etu.id, s.id))
-            if status is True: row[col_name] = "P" if langue == "fr" else "ح"
-            elif status is False: row[col_name] = "A" if langue == "fr" else "غ"
-            else: row[col_name] = "-"
+            if status is True:
+                row[col_name] = "P" if langue == "fr" else "ح"
+            elif status is False:
+                row[col_name] = "A" if langue == "fr" else "غ"
+            else:
+                row[col_name] = "-"
         data.append(row)
 
     df = pd.DataFrame(data)
@@ -63,27 +127,37 @@ async def export_absences_excel(
         workbook = writer.book
         worksheet = writer.sheets['Presence']
         
-        # Formatage Professionnel
-        header_fmt = workbook.add_format({'bold': True, 'bg_color': '#3B82F6', 'font_color': 'white', 'border': 1, 'align': 'center'})
+        header_fmt = workbook.add_format({
+            'bold': True, 
+            'bg_color': '#3B82F6', 
+            'font_color': 'white', 
+            'border': 1, 
+            'align': 'center'
+        })
         cell_fmt = workbook.add_format({'border': 1, 'align': 'center'})
 
-        if langue == "ar": worksheet.right_to_left()
+        if langue == "ar":
+            worksheet.right_to_left()
         
         for col_num, value in enumerate(df.columns.values):
             worksheet.write(0, col_num, value, header_fmt)
             worksheet.set_column(col_num, col_num, 15, cell_fmt)
 
     output.seek(0)
-    return StreamingResponse(output, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    return StreamingResponse(
+        output, 
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
-# ---------- EXPORT BILANS (CORRIGÉ AVEC ID ET DÉCORATION) ----------
+
+# ---------- EXPORT BILANS ----------
 
 @router.get("/bilans-excel/{classe_id}")
 async def export_bilans_excel(
     classe_id: int, 
     semestre: int,
     json: bool = False,
-    langue: str = Query("fr", regex="^(fr|ar)$"), 
+    langue: str = Query("fr", pattern="^(fr|ar)$"), 
     db: Session = Depends(get_db)
 ):
     resultats = db.query(BilanSemestriel, Etudiant).join(Etudiant).filter(
@@ -92,9 +166,11 @@ async def export_bilans_excel(
     ).all()
 
     if not resultats:
-        return [] if json else HTTPException(status_code=404, detail="Aucun bilan trouvé")
+        if json:
+            return []
+        raise HTTPException(status_code=404, detail="Aucun bilan trouvé")
 
-    # SI JSON : Pour le tableau React (IMPORTANT : Contient l'ID pour la modif)
+    # SI JSON : Pour affichage / modification dans le frontend
     if json:
         return [
             {
@@ -106,14 +182,15 @@ async def export_bilans_excel(
             } for bilan, etu in resultats
         ]
 
-    # SI EXCEL : Construction pour téléchargement
+    # SI EXCEL : Traduction et harmonisation des remarques
     data = []
     for bilan, etu in resultats:
+        remarque_propre = harmoniser_remarque(bilan.remarque_finale, langue)
         data.append({
             "Code Massar": etu.code_massar,
             "Nom Complet": etu.nom_complet,
             "Note Finale": bilan.note_finale,
-            "Remarque": bilan.remarque_finale
+            "Remarque": remarque_propre
         })
 
     df = pd.DataFrame(data)
@@ -128,28 +205,31 @@ async def export_bilans_excel(
         workbook = writer.book
         worksheet = writer.sheets[sheet_name]
 
-        # --- DÉCORATION ---
         header_format = workbook.add_format({
-            'bold': True, 'bg_color': '#3B82F6', 'font_color': 'white',
-            'border': 1, 'align': 'center', 'valign': 'vcenter'
+            'bold': True, 
+            'bg_color': '#3B82F6', 
+            'font_color': 'white', 
+            'border': 1, 
+            'align': 'center', 
+            'valign': 'vcenter'
         })
         
         cell_format = workbook.add_format({
-            'border': 1, 'align': 'center', 'valign': 'vcenter'
+            'border': 1, 
+            'align': 'center', 
+            'valign': 'vcenter'
         })
 
         if langue == "ar":
             worksheet.right_to_left()
 
-        # Application du style aux entêtes et colonnes
         for col_num, value in enumerate(df.columns.values):
             worksheet.write(0, col_num, value, header_format)
-            # Colonnes plus larges pour les noms et remarques
-            width = 30 if "Nom" in value or "الاسم" in value or "Remarque" in value or "ملاحظة" in value else 15
+            width = 32 if any(k in str(value) for k in ["Nom", "الاسم", "Remarque", "ملاحظة"]) else 16
             worksheet.set_column(col_num, col_num, width, cell_format)
 
     output.seek(0)
-    filename = f"bilans_S{semestre}.xlsx"
+    filename = f"bilans_S{semestre}_{langue}.xlsx"
     return StreamingResponse(
         output, 
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

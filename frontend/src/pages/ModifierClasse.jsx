@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./styles/ModifierClasse.css";
@@ -19,12 +19,12 @@ const ModifierClasse = () => {
       try {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
-        const resNiveaux = await axios.get(
-          `https://profmanager.onrender.com/niveaux/?lang=${i18n.language}`, { headers }
+        const resNiveaux = await api.get(
+          `niveaux/?lang=${i18n.language}`, { headers }
         );
         setNiveaux(resNiveaux.data);
-        const resClasse = await axios.get(
-          `https://profmanager.onrender.com/classes/${id}`, { headers }
+        const resClasse = await api.get(
+          `classes/${id}`, { headers }
         );
         setFormData({ nom: resClasse.data.nom, niveau_id: resClasse.data.niveau_id });
         setLoading(false);
@@ -44,7 +44,7 @@ const ModifierClasse = () => {
     if (selectedFile) data.append("file", selectedFile);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`https://profmanager.onrender.com/classes/${id}`, data, {
+      await api.put(`classes/${id}`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",

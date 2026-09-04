@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api/api";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import "./Register.css";
@@ -20,15 +20,19 @@ const Register = () => {
     mot_de_passe: "",
   });
 
-  const isAr = i18n.language === "ar";
+  const isAr = i18n.language?.startsWith("ar");
 
   useEffect(() => {
     const fetchCycles = async () => {
       try {
-        const res = await axios.get(
-          `https://profmanager.onrender.com/cycles/?lang=${i18n.language}`,
-        );
-        if (Array.isArray(res.data)) setCycles(res.data);
+        // Normalisation : 'fr-FR' ou 'en-US' -> 'fr', 'ar-MA' -> 'ar'
+        const currentLang = i18n.language || "fr";
+        const cleanLang = currentLang.startsWith("ar") ? "ar" : "fr";
+
+        const res = await api.get(`cycles/?lang=${cleanLang}`);
+        if (Array.isArray(res.data)) {
+          setCycles(res.data);
+        }
       } catch (err) {
         console.error("Erreur cycles:", err);
       }
@@ -40,9 +44,8 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("https://profmanager.onrender.com/auth/send-code", null, {
+      await api.post("auth/send-code", null, {
         params: { email: formData.email },
-        headers: { "Accept-Language": i18n.language },
       });
       setStep(2);
     } catch (err) {
@@ -54,7 +57,7 @@ const Register = () => {
 
   const handleVerifyCode = async () => {
     try {
-      await axios.post("https://profmanager.onrender.com/auth/verify-code", null, {
+      await api.post("auth/verify-code", null, {
         params: { email: formData.email, code: formData.code },
       });
       setStep(3);
@@ -66,7 +69,7 @@ const Register = () => {
   const handleFinalRegister = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("https://profmanager.onrender.com/auth/register", {
+      await api.post("auth/register", {
         ...formData,
         cycle_id: parseInt(formData.cycle_id),
       });
@@ -76,7 +79,6 @@ const Register = () => {
     }
   };
 
-  /* Step indicator helpers */
   const stepStatus = (n) =>
     step > n ? "done" : step === n ? "active" : "pending";
   const lineStatus = (n) => (step > n ? "done" : "");
@@ -86,7 +88,6 @@ const Register = () => {
       <div className="register-card">
         <h1 className="register-title">ProfManager</h1>
 
-        {/* Step indicator */}
         <div className="register-steps" style={{ marginBottom: "1.75rem" }}>
           <div className={`register-step-dot ${stepStatus(1)}`}>1</div>
           <div className={`register-step-line ${lineStatus(1)}`} />
@@ -96,7 +97,6 @@ const Register = () => {
         </div>
 
         <div dir={isAr ? "rtl" : "ltr"}>
-          {/* ── Step 1 : Informations ─────────────────────── */}
           {step === 1 && (
             <form
               onSubmit={handleSendCode}
@@ -161,7 +161,6 @@ const Register = () => {
             </form>
           )}
 
-          {/* ── Step 2 : Code vérification ────────────────── */}
           {step === 2 && (
             <div className="register-form register-step-enter">
               <p className="register-code-hint">
@@ -185,7 +184,6 @@ const Register = () => {
             </div>
           )}
 
-          {/* ── Step 3 : Mot de passe ─────────────────────── */}
           {step === 3 && (
             <form
               onSubmit={handleFinalRegister}

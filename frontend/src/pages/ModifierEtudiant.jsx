@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./styles/ModifierEtudiant.css";
@@ -22,9 +22,9 @@ const ModifierEtudiant = () => {
       try {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
-        const resClasses = await axios.get("https://profmanager.onrender.com/classes/", { headers });
+        const resClasses = await api.get("classes/", { headers });
         setClasses(resClasses.data);
-        const resEtud = await axios.get(`https://profmanager.onrender.com/etudiants/${id}`, { headers });
+        const resEtud = await api.get(`etudiants/${id}`, { headers });
         setFormData({
           nom_complet: resEtud.data.nom_complet,
           code_massar: resEtud.data.code_massar,
@@ -43,7 +43,7 @@ const ModifierEtudiant = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`https://profmanager.onrender.com/etudiants/${id}`, formData, {
+      await api.put(`etudiants/${id}`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/etudiants");

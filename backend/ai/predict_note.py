@@ -3,53 +3,49 @@ import joblib
 import pandas as pd
 import gdown
 
-# --- CONFIGURATION DES CHEMINS ---
 BASE_DIR = os.path.dirname(__file__)
 MODEL_PATH = os.path.join(BASE_DIR, "note_model.pkl")
-
-# ID de ton fichier sur Google Drive
 FILE_ID = "1FRNbV6BMdF6OaqjD0szTG06RxdP0I1nl"
 
+_model = None
+
 def load_model():
-    """
-    Télécharge le modèle depuis Google Drive s'il n'existe pas localement,
-    puis le charge en mémoire.
-    """
+    global _model
     if not os.path.exists(MODEL_PATH):
         print("--- Téléchargement du modèle via gdown (151 Mo)... ---")
         try:
-            # Utilisation de gdown pour contourner la vérification antivirus de Google
             url = f'https://drive.google.com/uc?id={FILE_ID}'
-            # gdown télécharge directement le fichier binaire au bon endroit
             gdown.download(url, MODEL_PATH, quiet=False)
             print("--- Téléchargement terminé avec succès ! ---")
         except Exception as e:
-            print(f"--- Erreur lors du téléchargement avec gdown : {e} ---")
+            print(f"--- Erreur gdown : {e} ---")
             return None
     
     try:
-        # Chargement du modèle avec joblib
-        return joblib.load(MODEL_PATH)
+        _model = joblib.load(MODEL_PATH)
+        print("--- Modèle IA chargé en RAM ---")
+        return _model
     except Exception as e:
-        print(f"--- Erreur lors du chargement du fichier .pkl : {e} ---")
+        print(f"--- Erreur joblib.load : {e} ---")
         return None
 
-# --- INITIALISATION DU MODÈLE ---
-model = load_model()
+def set_model(new_model):
+    global _model
+    _model = new_model
 
-def predict_note(data):
-    """
-    Prend en entrée un dictionnaire de données et retourne la note prédite.
-    """
-    # Sécurité si le modèle n'a pas pu être chargé
-    if model is None:
-        return "Erreur : Modèle non disponible"
+# Chargement unique à l'import
+_model = load_model()
 
-    # Logique métier : si trop d'absences, la note est 0
-    if data["absence_pct"] >= 1:
+def predict_note(data: dict):
+    global _model
+    if _model is None:
+        _model = load_model()
+        if _model is None:
+            return 10.0  # Note de secours pour ne pas faire planter la route
+
+    if data.get("absence_pct", 0) >= 1.0:
         return 0.0
 
-    # Création du DataFrame pour la prédiction (doit correspondre aux colonnes d'entraînement)
     df = pd.DataFrame([{
         "comportement_moy": data["comportement_moy"],
         "participation_moy": data["participation_moy"],
@@ -58,12 +54,9 @@ def predict_note(data):
         "materiel_oubli_pct": data["materiel_oubli_pct"]
     }])
 
-    # Prédiction
     try:
-        note = model.predict(df)[0]
-        # On contraint la note entre 0 et 20
-        note = max(0, min(20, note))
-        return round(note, 2)
+        note = _model.predict(df)[0]
+        return round(float(max(0.0, min(20.0, note))), 2)
     except Exception as e:
-        print(f"--- Erreur lors de la prédiction : {e} ---")
-        return "Erreur de calcul"
+        print(f"--- Erreur prédiction : {e} ---")
+        return 10.0

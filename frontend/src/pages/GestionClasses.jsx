@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import "./styles/GestionClasses.css";
@@ -35,11 +35,11 @@ const GestionClasses = () => {
       const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
       const [resClasses, resNiveaux, resCycles] = await Promise.all([
-        axios.get("https://profmanager.onrender.com/classes/", { headers }),
-        axios.get(`https://profmanager.onrender.com/niveaux/?lang=${i18n.language}`, {
+        api.get("classes/", { headers }),
+        api.get(`niveaux/?lang=${i18n.language}`, {
           headers,
         }),
-        axios.get(`https://profmanager.onrender.com/cycles/?lang=${i18n.language}`, {
+        api.get(`cycles/?lang=${i18n.language}`, {
           headers,
         }),
       ]);
@@ -50,8 +50,8 @@ const GestionClasses = () => {
       setNiveaux(resNiveaux.data);
       resClasses.data.forEach(async (cls) => {
         try {
-          const res = await axios.get(
-            `https://profmanager.onrender.com/etudiants/classe/${cls.id}`,
+          const res = await api.get(
+            `etudiants/classe/${cls.id}`,
             { headers },
           );
           setCounts((prev) => ({ ...prev, [cls.id]: res.data.length }));
@@ -75,7 +75,7 @@ const GestionClasses = () => {
     if (!window.confirm(msg)) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://profmanager.onrender.com/classes/${id}`, {
+      await api.delete(`classes/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
@@ -87,9 +87,9 @@ const GestionClasses = () => {
   const handleExportAbs = async (classeId, mois = null) => {
     try {
       const token = localStorage.getItem("token");
-      let url = `https://profmanager.onrender.com/export/absences-excel/${classeId}?langue=${i18n.language}`;
+      let url = `export/absences-excel/${classeId}?langue=${i18n.language}`;
       if (mois) url += `&mois=${mois}`;
-      const res = await axios.get(url, {
+      const res = await api.get(url, {
         headers: { Authorization: `Bearer ${token}` },
         responseType: "blob",
       });
@@ -113,8 +113,8 @@ const GestionClasses = () => {
     setEtudiants([]);
     setSelectedClasse(cls);
     try {
-      const res = await axios.get(
-        `https://profmanager.onrender.com/etudiants/classe/${cls.id}`,
+      const res = await api.get(
+        `etudiants/classe/${cls.id}`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         },

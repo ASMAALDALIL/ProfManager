@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./styles/AjouterClasse.css";
@@ -18,12 +18,12 @@ const AjouterClasse = () => {
       try {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
-        const profRes = await axios.get("https://profmanager.onrender.com/professeur/me", {
+        const profRes = await api.get("professeur/me", {
           headers,
         });
         setCycleProf(profRes.data.cycle_id);
-        const resNiveaux = await axios.get(
-          `https://profmanager.onrender.com/niveaux/?lang=${i18n.language}`,
+        const resNiveaux = await api.get(
+          `niveaux/?lang=${i18n.language}`,
           { headers },
         );
         setNiveaux(
@@ -47,7 +47,7 @@ const AjouterClasse = () => {
     data.append("file", selectedFile);
     try {
       const token = localStorage.getItem("token");
-      await axios.post("https://profmanager.onrender.com/classes/", data, {
+      await api.post("classes/", data, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { useTranslation } from "react-i18next";
 import "./styles/CalculateurNotes.css";
 
@@ -26,7 +26,7 @@ const CalculateurNotes = () => {
   const fetchClasses = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("https://profmanager.onrender.com/classes/", {
+      const res = await api.get("classes/", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setClasses(res.data);
@@ -44,13 +44,13 @@ const CalculateurNotes = () => {
         Authorization: `Bearer ${token}`,
         "Accept-Language": i18n.language,
       };
-      await axios.post(
-        `https://profmanager.onrender.com/bilans/generer-classe/${selectedClasse}?semestre=${selectedSemestre}`,
+      await api.post(
+        `bilans/generer-classe/${selectedClasse}?semestre=${selectedSemestre}`,
         {},
         { headers },
       );
-      const res = await axios.get(
-        `https://profmanager.onrender.com/export/bilans-excel/${selectedClasse}?json=true&semestre=${selectedSemestre}`,
+      const res = await api.get(
+        `export/bilans-excel/${selectedClasse}?json=true&semestre=${selectedSemestre}`,
         { headers },
       );
       setBilans(Array.isArray(res.data) ? res.data : []);
@@ -65,8 +65,8 @@ const CalculateurNotes = () => {
     if (!selectedClasse) return;
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(
-        `https://profmanager.onrender.com/export/bilans-excel/${selectedClasse}?semestre=${selectedSemestre}&langue=${i18n.language}`,
+      const res = await api.get(
+        `export/bilans-excel/${selectedClasse}?semestre=${selectedSemestre}&langue=${i18n.language}`,
         { headers: { Authorization: `Bearer ${token}` }, responseType: "blob" },
       );
       const url = window.URL.createObjectURL(new Blob([res.data]));
@@ -89,8 +89,8 @@ const CalculateurNotes = () => {
     }
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
-        `https://profmanager.onrender.com/bilans/modifier/${currentBilan.id}`,
+      await api.put(
+        `bilans/modifier/${currentBilan.id}`,
         {
           note_finale: parseFloat(editForm.note_finale),
           remarque_finale: editForm.remarque_finale,

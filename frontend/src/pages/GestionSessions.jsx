@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import "./styles/GestionSessions.css";
@@ -18,11 +18,11 @@ const GestionSessions = () => {
       try {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
-        const resClasses = await axios.get("https://profmanager.onrender.com/classes/", {
+        const resClasses = await api.get("classes/", {
           headers,
         });
-        const resSessions = await axios.get(
-          "https://profmanager.onrender.com/sessions/toutes",
+        const resSessions = await api.get(
+          "sessions/toutes",
           { headers },
         );
         setClasses(resClasses.data);

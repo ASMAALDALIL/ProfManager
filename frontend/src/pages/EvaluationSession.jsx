@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./styles/EvaluationSession.css";
@@ -20,14 +20,14 @@ const EvaluationSession = () => {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
 
-        const resEtud = await axios.get(
-          `https://profmanager.onrender.com/etudiants/classe/${classeId}`,
+        const resEtud = await api.get(
+          `etudiants/classe/${classeId}`,
           { headers },
         );
         setEtudiants(resEtud.data);
 
-        const resEval = await axios.get(
-          `https://profmanager.onrender.com/evaluations/session/${sessionId}`,
+        const resEval = await api.get(
+          `evaluations/session/${sessionId}`,
           { headers },
         );
 
@@ -92,8 +92,8 @@ const EvaluationSession = () => {
     if (isReadOnly) return setIsReadOnly(false);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        "https://profmanager.onrender.com/evaluations/save-session",
+      await api.post(
+        "evaluations/save-session",
         {
           id_session: parseInt(sessionId),
           id_classe: parseInt(classeId),

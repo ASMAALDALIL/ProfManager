@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./styles/Dashboard.css";
@@ -106,10 +106,10 @@ const Dashboard = () => {
 
       const [resProfil, resClasses, resSessions, resEtudiants] =
         await Promise.all([
-          axios.get("https://profmanager.onrender.com/professeur/me", { headers }),
-          axios.get("https://profmanager.onrender.com/classes/", { headers }),
-          axios.get("https://profmanager.onrender.com/sessions/toutes", { headers }),
-          axios.get("https://profmanager.onrender.com/etudiants/tous", { headers }),
+          api.get("professeur/me", { headers }),
+          api.get("classes/", { headers }),
+          api.get("sessions/toutes", { headers }),
+          api.get("etudiants/tous", { headers }),
         ]);
 
       setProfil(resProfil.data);

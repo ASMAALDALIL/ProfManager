@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./styles/HistoriqueEtudiant.css";
@@ -17,12 +17,12 @@ const HistoriqueEtudiant = () => {
       try {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
-        const resEtud = await axios.get(
-          `https://profmanager.onrender.com/etudiants/${etudiantId}`, { headers }
+        const resEtud = await api.get(
+          `etudiants/${etudiantId}`, { headers }
         );
         setEtudiant(resEtud.data);
-        const resHist = await axios.get(
-          `https://profmanager.onrender.com/evaluations/etudiant/${etudiantId}/historique`, { headers }
+        const resHist = await api.get(
+          `evaluations/etudiant/${etudiantId}/historique`, { headers }
         );
         setHistorique(resHist.data);
       } catch (err) {

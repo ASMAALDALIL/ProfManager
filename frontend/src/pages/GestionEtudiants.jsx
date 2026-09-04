@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import "./styles/GestionEtudiants.css";
@@ -18,12 +18,12 @@ const GestionEtudiants = () => {
       try {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
-        const resClasses = await axios.get("https://profmanager.onrender.com/classes/", {
+        const resClasses = await api.get("classes/", {
           headers,
         });
         setClasses(resClasses.data);
-        const resEtud = await axios.get(
-          "https://profmanager.onrender.com/etudiants/tous",
+        const resEtud = await api.get(
+          "etudiants/tous",
           { headers },
         );
         setEtudiants(resEtud.data);
@@ -41,7 +41,7 @@ const GestionEtudiants = () => {
     if (window.confirm(confirmMsg)) {
       try {
         const token = localStorage.getItem("token");
-        await axios.delete(`https://profmanager.onrender.com/etudiants/${id}`, {
+        await api.delete(`etudiants/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setEtudiants(etudiants.filter((e) => e.id !== id));
