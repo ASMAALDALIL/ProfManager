@@ -2,7 +2,7 @@ import axios from "axios";
 import i18n from "../i18n";
 
 // Utilise la variable d'environnement injectée lors du build/docker, sinon localhost en local
-const baseURL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/";
+const baseURL = import.meta.env.VITE_API_URL || "https://profmanager.onrender.com/";
 
 const api = axios.create({
   baseURL,
