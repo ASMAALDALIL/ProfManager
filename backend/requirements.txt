@@ -30,3 +30,5 @@ gdown
 
 # ── traduction ─────────────────────────────
 deep-translator
+
+resend
