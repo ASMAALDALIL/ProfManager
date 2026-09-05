@@ -10,13 +10,13 @@ const Register = () => {
   const [step, setStep] = useState(1);
   const [cycles, setCycles] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [formData, setFormData] = useState({
     prenom: "",
     nom: "",
     email: "",
     telephone: "",
     cycle_id: "",
-    code: "",
     mot_de_passe: "",
   });
 
@@ -25,7 +25,6 @@ const Register = () => {
   useEffect(() => {
     const fetchCycles = async () => {
       try {
-        // Normalisation : 'fr-FR' ou 'en-US' -> 'fr', 'ar-MA' -> 'ar'
         const currentLang = i18n.language || "fr";
         const cleanLang = currentLang.startsWith("ar") ? "ar" : "fr";
 
@@ -40,34 +39,26 @@ const Register = () => {
     fetchCycles();
   }, [i18n.language]);
 
-  const handleSendCode = async (e) => {
+  // Passage direct à la saisie du mot de passe
+  const handleNextStep = (e) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      await api.post("auth/send-code", null, {
-        params: { email: formData.email },
-      });
-      setStep(2);
-    } catch (err) {
-      alert(err.response?.data?.detail || "Erreur d'envoi");
-    } finally {
-      setLoading(false);
-    }
+    setStep(2);
   };
 
-  const handleVerifyCode = async () => {
-    try {
-      await api.post("auth/verify-code", null, {
-        params: { email: formData.email, code: formData.code },
-      });
-      setStep(3);
-    } catch (err) {
-      alert(isAr ? "الرمز غير صحيح" : "Code incorrect");
-    }
-  };
-
+  // Inscription directe sans code
   const handleFinalRegister = async (e) => {
     e.preventDefault();
+
+    if (formData.mot_de_passe !== confirmPassword) {
+      alert(
+        isAr
+          ? "كلمات المرور غير متطابقة"
+          : "Les mots de passe ne correspondent pas"
+      );
+      return;
+    }
+
+    setLoading(true);
     try {
       await api.post("auth/register", {
         ...formData,
@@ -76,6 +67,8 @@ const Register = () => {
       navigate("/login");
     } catch (err) {
       alert(err.response?.data?.detail || "Erreur inscription");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -88,18 +81,17 @@ const Register = () => {
       <div className="register-card">
         <h1 className="register-title">ProfManager</h1>
 
+        {/* Barre de progression simplifiée en 2 étapes */}
         <div className="register-steps" style={{ marginBottom: "1.75rem" }}>
           <div className={`register-step-dot ${stepStatus(1)}`}>1</div>
           <div className={`register-step-line ${lineStatus(1)}`} />
           <div className={`register-step-dot ${stepStatus(2)}`}>2</div>
-          <div className={`register-step-line ${lineStatus(2)}`} />
-          <div className={`register-step-dot ${stepStatus(3)}`}>3</div>
         </div>
 
         <div dir={isAr ? "rtl" : "ltr"}>
           {step === 1 && (
             <form
-              onSubmit={handleSendCode}
+              onSubmit={handleNextStep}
               className="register-form register-step-enter"
             >
               <div className="register-grid-2">
@@ -108,6 +100,7 @@ const Register = () => {
                   placeholder={t("firstname")}
                   className="register-input"
                   required
+                  value={formData.prenom}
                   onChange={(e) =>
                     setFormData({ ...formData, prenom: e.target.value })
                   }
@@ -117,6 +110,7 @@ const Register = () => {
                   placeholder={t("lastname")}
                   className="register-input"
                   required
+                  value={formData.nom}
                   onChange={(e) =>
                     setFormData({ ...formData, nom: e.target.value })
                   }
@@ -127,6 +121,7 @@ const Register = () => {
                 placeholder={t("email")}
                 className="register-input"
                 required
+                value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
@@ -136,6 +131,7 @@ const Register = () => {
                 placeholder={t("phone")}
                 className="register-input"
                 required
+                value={formData.telephone}
                 onChange={(e) =>
                   setFormData({ ...formData, telephone: e.target.value })
                 }
@@ -155,36 +151,13 @@ const Register = () => {
                   </option>
                 ))}
               </select>
-              <button type="submit" className="register-btn" disabled={loading}>
-                {loading ? "..." : t("btn_send_code")}
+              <button type="submit" className="register-btn">
+                {isAr ? "التالي" : "Suivant"}
               </button>
             </form>
           )}
 
           {step === 2 && (
-            <div className="register-form register-step-enter">
-              <p className="register-code-hint">
-                {isAr
-                  ? "أدخل الرمز المرسل إلى بريدك"
-                  : "Entrez le code envoyé à votre email"}
-              </p>
-              <input
-                type="text"
-                placeholder="0000"
-                className="register-code-input"
-                maxLength={6}
-                onChange={(e) =>
-                  setFormData({ ...formData, code: e.target.value })
-                }
-                required
-              />
-              <button onClick={handleVerifyCode} className="register-btn">
-                {t("btn_verify")}
-              </button>
-            </div>
-          )}
-
-          {step === 3 && (
             <form
               onSubmit={handleFinalRegister}
               className="register-form register-step-enter"
@@ -194,6 +167,7 @@ const Register = () => {
                 placeholder={t("password")}
                 className="register-input"
                 required
+                value={formData.mot_de_passe}
                 onChange={(e) =>
                   setFormData({ ...formData, mot_de_passe: e.target.value })
                 }
@@ -203,9 +177,19 @@ const Register = () => {
                 placeholder={t("confirm_password")}
                 className="register-input"
                 required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
-              <button type="submit" className="register-btn">
-                {t("btn_finish")}
+              <button type="submit" className="register-btn" disabled={loading}>
+                {loading ? "..." : t("btn_finish")}
+              </button>
+              <button
+                type="button"
+                className="register-btn"
+                style={{ background: "transparent", border: "1px solid #ccc", marginTop: "0.5rem" }}
+                onClick={() => setStep(1)}
+              >
+                {isAr ? "رجوع" : "Retour"}
               </button>
             </form>
           )}
