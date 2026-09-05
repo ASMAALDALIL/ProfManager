@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import api from "../api/api";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./styles/GestionClasses.css";
 
 const GestionClasses = () => {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [classes, setClasses] = useState([]);
   const [niveaux, setNiveaux] = useState([]);
   const [cycleData, setCycleData] = useState({});
@@ -33,21 +34,25 @@ const GestionClasses = () => {
     { id: 6, fr: "Juin", ar: "يونيو" },
   ];
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
-      const headers = { Authorization: `Bearer ${token}` };
+      const headers = { 
+        Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache"
+      };
 
-      // 1. Récupérer les classes en priorité
-      const resClasses = await api.get("classes/", { headers });
+      // Timestamp pour forcer le contournement du cache navigateur
+      const resClasses = await api.get(`classes/?_t=${Date.now()}`, { headers });
       const classesList = Array.isArray(resClasses.data) ? resClasses.data : [];
       setClasses(classesList);
 
-      // 2. Récupérer les données de libellés (Niveaux et Cycles)
+      // Récupérer les niveaux et cycles
       try {
         const [resNiveaux, resCycles] = await Promise.all([
-          api.get(`niveaux/?lang=${langActive}`, { headers }),
-          api.get(`cycles/?lang=${langActive}`, { headers }),
+          api.get(`niveaux/?lang=${langActive}&_t=${Date.now()}`, { headers }),
+          api.get(`cycles/?lang=${langActive}&_t=${Date.now()}`, { headers }),
         ]);
 
         const cyclesMap = {};
@@ -62,10 +67,10 @@ const GestionClasses = () => {
         console.warn("Erreur chargement cycles/niveaux:", errLang);
       }
 
-      // 3. Charger le compte d'étudiants par classe
+      // Charger le compte des étudiants
       classesList.forEach(async (cls) => {
         try {
-          const res = await api.get(`etudiants/classe/${cls.id}`, { headers });
+          const res = await api.get(`etudiants/classe/${cls.id}?_t=${Date.now()}`, { headers });
           setCounts((prev) => ({ ...prev, [cls.id]: res.data.length }));
         } catch (e) {
           console.error(`Erreur comptage étudiants classe ${cls.id}:`, e);
@@ -74,11 +79,16 @@ const GestionClasses = () => {
     } catch (err) {
       console.error("Erreur chargement classes :", err);
     }
-  };
+  }, [langActive]);
 
+  // Recharge au montage, au changement d'URL et au retour sur la page
   useEffect(() => {
     fetchData();
-  }, [langActive]);
+
+    const handleFocus = () => fetchData();
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [fetchData, location.key]);
 
   const handleDelete = async (id) => {
     const msg = isAr
@@ -125,7 +135,7 @@ const GestionClasses = () => {
     setEtudiants([]);
     setSelectedClasse(cls);
     try {
-      const res = await api.get(`etudiants/classe/${cls.id}`, {
+      const res = await api.get(`etudiants/classe/${cls.id}?_t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setEtudiants(res.data);
