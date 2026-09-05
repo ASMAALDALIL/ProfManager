@@ -104,30 +104,49 @@ const Dashboard = () => {
       const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
 
+      // Utilisation de Promise.allSettled pour ne pas bloquer si une route échoue
       const [resProfil, resClasses, resSessions, resEtudiants] =
-        await Promise.all([
+        await Promise.allSettled([
           api.get("professeur/me", { headers }),
           api.get("classes/", { headers }),
           api.get("sessions/toutes", { headers }),
           api.get("etudiants/tous", { headers }),
         ]);
 
-      setProfil(resProfil.data);
-      setClasses(resClasses.data);
-      setSessions(resSessions.data);
+      let classesData = [];
+      let sessionsData = [];
+      let etudiantsCount = 0;
+
+      if (resProfil.status === "fulfilled") {
+        setProfil(resProfil.value.data);
+      }
+
+      if (resClasses.status === "fulfilled" && Array.isArray(resClasses.value.data)) {
+        classesData = resClasses.value.data;
+        setClasses(classesData);
+      }
+
+      if (resSessions.status === "fulfilled" && Array.isArray(resSessions.value.data)) {
+        sessionsData = resSessions.value.data;
+        setSessions(sessionsData);
+      }
+
+      if (resEtudiants.status === "fulfilled" && Array.isArray(resEtudiants.value.data)) {
+        etudiantsCount = resEtudiants.value.data.length;
+      }
+
       setStats({
-        etudiants: resEtudiants.data.length,
-        classes: resClasses.data.length,
-        sessions: resSessions.data.length,
+        classes: classesData.length,
+        sessions: sessionsData.length,
+        etudiants: etudiantsCount,
       });
     } catch (err) {
-      console.error("Erreur dashboard", err);
+      console.error("Erreur dashboard :", err);
     } finally {
       setLoading(false);
     }
   };
 
-  /* Format date nicely */
   const formatDate = (dateStr) => {
     if (!dateStr) return "--";
     const d = new Date(dateStr);
@@ -138,7 +157,6 @@ const Dashboard = () => {
     });
   };
 
-  /* Today's greeting */
   const today = new Date().toLocaleDateString(isAr ? "ar-MA" : "fr-FR", {
     weekday: "long",
     day: "numeric",
@@ -146,7 +164,6 @@ const Dashboard = () => {
     year: "numeric",
   });
 
-  /* Stat cards config */
   const statCards = [
     {
       cls: "card-students",
@@ -173,7 +190,6 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-page" dir={isAr ? "rtl" : "ltr"}>
-      {/* ── Greeting ───────────────────────────────────── */}
       <div className="dashboard-greeting">
         <h1>
           <p className="dashboard-greeting-sub">
@@ -183,7 +199,6 @@ const Dashboard = () => {
         <p className="dashboard-greeting-date">{today}</p>
       </div>
 
-      {/* ── Stat Cards ─────────────────────────────────── */}
       <div className="dashboard-stats-grid">
         {statCards.map((card) => (
           <div
@@ -214,7 +229,6 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* ── Sessions section ────────────────────────────── */}
       <div className="dashboard-section-header">
         <h2 className="dashboard-section-title">
           {isAr ? "آخر الحصص" : "Sessions récentes"}
@@ -240,7 +254,6 @@ const Dashboard = () => {
             ))}
           </div>
         ) : sessions.length === 0 ? (
-          /* ── Empty state ─────────────────────────────── */
           <div className="dashboard-empty">
             <div className="dashboard-empty-icon">
               <IconCalendar />
@@ -263,7 +276,6 @@ const Dashboard = () => {
             </button>
           </div>
         ) : (
-          /* ── Table ───────────────────────────────────── */
           <table className="dashboard-table">
             <thead>
               <tr>
@@ -309,7 +321,6 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* If more sessions, show link to full list */}
       {sessions.length > 10 && (
         <div style={{ textAlign: isAr ? "right" : "left", marginTop: "1rem" }}>
           <button

@@ -15,7 +15,10 @@ const GestionClasses = () => {
   const [etudiants, setEtudiants] = useState([]);
   const [showMonthModal, setShowMonthModal] = useState(false);
   const [exportClasseId, setExportClasseId] = useState(null);
-  const isAr = i18n.language === "ar";
+
+  // Normalisation stricte de la langue : "ar" ou "fr"
+  const langActive = (i18n.language || "fr").toLowerCase().startsWith("ar") ? "ar" : "fr";
+  const isAr = langActive === "ar";
 
   const moisAnnee = [
     { id: 9, fr: "Sept.", ar: "شتنبر" },
@@ -34,39 +37,48 @@ const GestionClasses = () => {
     try {
       const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
-      const [resClasses, resNiveaux, resCycles] = await Promise.all([
-        api.get("classes/", { headers }),
-        api.get(`niveaux/?lang=${i18n.language}`, {
-          headers,
-        }),
-        api.get(`cycles/?lang=${i18n.language}`, {
-          headers,
-        }),
-      ]);
-      const cyclesMap = {};
-      resCycles.data.forEach((c) => (cyclesMap[c.id] = c.label));
-      setCycleData(cyclesMap);
-      setClasses(resClasses.data);
-      setNiveaux(resNiveaux.data);
-      resClasses.data.forEach(async (cls) => {
+
+      // 1. Récupérer les classes en priorité
+      const resClasses = await api.get("classes/", { headers });
+      const classesList = Array.isArray(resClasses.data) ? resClasses.data : [];
+      setClasses(classesList);
+
+      // 2. Récupérer les données de libellés (Niveaux et Cycles)
+      try {
+        const [resNiveaux, resCycles] = await Promise.all([
+          api.get(`niveaux/?lang=${langActive}`, { headers }),
+          api.get(`cycles/?lang=${langActive}`, { headers }),
+        ]);
+
+        const cyclesMap = {};
+        if (Array.isArray(resCycles.data)) {
+          resCycles.data.forEach((c) => {
+            cyclesMap[c.id] = c.label;
+          });
+        }
+        setCycleData(cyclesMap);
+        setNiveaux(Array.isArray(resNiveaux.data) ? resNiveaux.data : []);
+      } catch (errLang) {
+        console.warn("Erreur chargement cycles/niveaux:", errLang);
+      }
+
+      // 3. Charger le compte d'étudiants par classe
+      classesList.forEach(async (cls) => {
         try {
-          const res = await api.get(
-            `etudiants/classe/${cls.id}`,
-            { headers },
-          );
+          const res = await api.get(`etudiants/classe/${cls.id}`, { headers });
           setCounts((prev) => ({ ...prev, [cls.id]: res.data.length }));
         } catch (e) {
-          console.error(e);
+          console.error(`Erreur comptage étudiants classe ${cls.id}:`, e);
         }
       });
     } catch (err) {
-      console.error(err);
+      console.error("Erreur chargement classes :", err);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, [i18n.language]);
+  }, [langActive]);
 
   const handleDelete = async (id) => {
     const msg = isAr
@@ -87,7 +99,7 @@ const GestionClasses = () => {
   const handleExportAbs = async (classeId, mois = null) => {
     try {
       const token = localStorage.getItem("token");
-      let url = `export/absences-excel/${classeId}?langue=${i18n.language}`;
+      let url = `export/absences-excel/${classeId}?langue=${langActive}`;
       if (mois) url += `&mois=${mois}`;
       const res = await api.get(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -113,12 +125,9 @@ const GestionClasses = () => {
     setEtudiants([]);
     setSelectedClasse(cls);
     try {
-      const res = await api.get(
-        `etudiants/classe/${cls.id}`,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        },
-      );
+      const res = await api.get(`etudiants/classe/${cls.id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       setEtudiants(res.data);
     } catch (e) {
       console.error(e);
@@ -127,7 +136,6 @@ const GestionClasses = () => {
 
   return (
     <div className={`gc-page`} dir={isAr ? "rtl" : "ltr"}>
-      {/* Header */}
       <div className="gc-header">
         <h1 className="gc-title">
           {isAr ? "تسيير الأقسام" : "Gestion des Classes"}
@@ -148,95 +156,95 @@ const GestionClasses = () => {
         </button>
       </div>
 
-      {/* Grid */}
       <div className="gc-grid">
-        {classes.map((cls) => {
-          const niveauLabel =
-            niveaux.find((n) => n.id === cls.niveau_id)?.label || "---";
-          return (
-            <div key={cls.id} className="gc-card">
-              {/* Top row */}
-              <div className="gc-card-top" dir="ltr">
-                <div>
-                  <h3 className="gc-card-name">{cls.nom}</h3>
-                  <span className="gc-cycle-badge">
-                    {cycleData[cls.cycle_id] || "---"}
+        {classes.length === 0 ? (
+          <p style={{ color: "#666", padding: "1rem" }}>
+            {isAr ? "لا توجد أقسام مسجلة حتى الآن." : "Aucune classe enregistrée pour le moment."}
+          </p>
+        ) : (
+          classes.map((cls) => {
+            const niveauLabel =
+              niveaux.find((n) => n.id === cls.niveau_id)?.label || "---";
+            return (
+              <div key={cls.id} className="gc-card">
+                <div className="gc-card-top" dir="ltr">
+                  <div>
+                    <h3 className="gc-card-name">{cls.nom}</h3>
+                    <span className="gc-cycle-badge">
+                      {cycleData[cls.cycle_id] || "---"}
+                    </span>
+                  </div>
+                  <div className="gc-card-actions">
+                    <button
+                      className="gc-icon-btn edit"
+                      onClick={() => navigate(`/classes/modifier/${cls.id}`)}
+                    >
+                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.6}
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      className="gc-icon-btn delete"
+                      onClick={() => handleDelete(cls.id)}
+                    >
+                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.6}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="gc-card-details" dir={isAr ? "rtl" : "ltr"}>
+                  <span className="gc-detail">
+                    {counts[cls.id] || 0} {isAr ? "تلاميذ" : "Étudiants"}
+                  </span>
+                  <span className="gc-detail">
+                    {isAr ? "المستوى" : "Niveau"} : {niveauLabel}
                   </span>
                 </div>
-                <div className="gc-card-actions">
+
+                <button
+                  className="gc-btn-session"
+                  onClick={() =>
+                    navigate(`/sessions/demarrer?classeId=${cls.id}`)
+                  }
+                >
+                  {isAr ? "تدبير الحصة" : "Gérer la séance"}
+                </button>
+
+                <div className="gc-card-footer" dir={isAr ? "rtl" : "ltr"}>
                   <button
-                    className="gc-icon-btn edit"
-                    onClick={() => navigate(`/classes/modifier/${cls.id}`)}
+                    className="gc-btn-outline"
+                    onClick={() => openStudents(cls)}
                   >
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1.6}
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      />
-                    </svg>
+                    {isAr ? "لائحة التلاميذ" : "Liste Étudiants"}
                   </button>
                   <button
-                    className="gc-icon-btn delete"
-                    onClick={() => handleDelete(cls.id)}
+                    className="gc-btn-outline"
+                    onClick={() => {
+                      setExportClasseId(cls.id);
+                      setShowMonthModal(true);
+                    }}
                   >
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1.6}
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
+                    {isAr ? "تصدير الغياب" : "Export Abs"}
                   </button>
                 </div>
               </div>
-
-              {/* Details */}
-              <div className="gc-card-details" dir={isAr ? "rtl" : "ltr"}>
-                <span className="gc-detail">
-                  {counts[cls.id] || 0} {isAr ? "تلاميذ" : "Étudiants"}
-                </span>
-                <span className="gc-detail">
-                  {isAr ? "المستوى" : "Niveau"} : {niveauLabel}
-                </span>
-              </div>
-
-              {/* Session button */}
-              <button
-                className="gc-btn-session"
-                onClick={() =>
-                  navigate(`/sessions/demarrer?classeId=${cls.id}`)
-                }
-              >
-                {isAr ? "تدبير الحصة" : "Gérer la séance"}
-              </button>
-
-              {/* Footer */}
-              <div className="gc-card-footer" dir={isAr ? "rtl" : "ltr"}>
-                <button
-                  className="gc-btn-outline"
-                  onClick={() => openStudents(cls)}
-                >
-                  {isAr ? "لائحة التلاميذ" : "Liste Étudiants"}
-                </button>
-                <button
-                  className="gc-btn-outline"
-                  onClick={() => {
-                    setExportClasseId(cls.id);
-                    setShowMonthModal(true);
-                  }}
-                >
-                  {isAr ? "تصدير الغياب" : "Export Abs"}
-                </button>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
 
-      {/* Month export modal */}
       {showMonthModal && (
         <div className="gc-overlay">
           <div className="gc-modal" dir={isAr ? "rtl" : "ltr"}>
@@ -270,7 +278,6 @@ const GestionClasses = () => {
         </div>
       )}
 
-      {/* Students list modal */}
       {selectedClasse && (
         <div className="gc-overlay">
           <div className="gc-modal-large" dir="ltr">

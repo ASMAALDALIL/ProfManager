@@ -18,9 +18,12 @@ def get_niveaux(
     db: Session = Depends(get_db),
     current_user: Professeur = Depends(get_current_user)
 ):
+    # Forcer strictement soit "ar", soit "fr" (par défaut "fr")
+    clean_lang = "ar" if lang and str(lang).strip().lower().startswith("ar") else "fr"
+
     return (
         db.query(Niveau.id, NiveauTranslation.label, Niveau.cycle_id)
         .join(NiveauTranslation)
-        .filter(NiveauTranslation.lang == lang)
+        .filter(NiveauTranslation.lang == clean_lang)
         .all()
     )

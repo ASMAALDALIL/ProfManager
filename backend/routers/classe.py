@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, s
 from sqlalchemy.orm import Session
 import pandas as pd
 import io
+import logging
 from typing import Optional
 from difflib import SequenceMatcher
 import re
@@ -15,6 +16,8 @@ from schemas.classe import Classe as ClasseSchema
 from .auth import get_current_user
 from .lang import get_lang
 
+logger = logging.getLogger("uvicorn.error")
+
 router = APIRouter(prefix="/classes", tags=["Classes"])
 
 
@@ -23,7 +26,9 @@ def get_my_classes(
     db: Session = Depends(get_db),
     current_user: Professeur = Depends(get_current_user)
 ):
-    return db.query(Classe).filter(Classe.professeur_id == current_user.id).all()
+    classes = db.query(Classe).filter(Classe.professeur_id == current_user.id).all()
+    logger.info(f"--> [GET /classes/] User authentifié: ID={current_user.id} ({current_user.email}) | Classes trouvées: {len(classes)}")
+    return classes
 
 
 # ---------- UTILS ----------
@@ -123,7 +128,7 @@ async def create_classe(
                         nom_complet=nom_etudiant,
                         code_massar=massar,
                         id_classe=new_classe.id,
-                        id_professeur=current_user.id  # <--- INJECTION DE L'ID PROFESSEUR
+                        id_professeur=current_user.id
                     )
                 )
 
@@ -133,7 +138,7 @@ async def create_classe(
 
     except Exception as e:
         db.rollback()
-        db.delete(new_classe) # Supprime la classe si l'importation échoue
+        db.delete(new_classe)
         db.commit()
         msg = f"Erreur : {str(e)}" if lang == "fr" else f"خطأ : {str(e)}"
         raise HTTPException(status_code=400, detail=msg)
@@ -188,7 +193,6 @@ async def update_classe(
 
             if not col_nom or not col_massar: raise Exception("Colonnes manquantes")
 
-            # Supprimer SEULEMENT les étudiants du professeur actuel pour cette classe
             db.query(Etudiant).filter(
                 Etudiant.id_classe == classe_id,
                 Etudiant.id_professeur == current_user.id
@@ -207,7 +211,7 @@ async def update_classe(
                             nom_complet=nom_etu,
                             code_massar=massar_etu,
                             id_classe=classe_id,
-                            id_professeur=current_user.id # <--- INJECTION DE L'ID PROFESSEUR
+                            id_professeur=current_user.id
                         )
                     )
             db.add_all(etudiants)
@@ -236,7 +240,6 @@ def delete_classe(
     if not classe:
         raise HTTPException(status_code=404, detail="Classe non trouvée")
 
-    # Supprime les étudiants liés à cette classe pour ce prof
     db.query(Etudiant).filter(
         Etudiant.id_classe == classe_id,
         Etudiant.id_professeur == current_user.id
@@ -245,6 +248,7 @@ def delete_classe(
     db.delete(classe)
     db.commit()
     return None
+
 
 @router.get("/{classe_id}", response_model=ClasseSchema)
 def get_classe_detail(

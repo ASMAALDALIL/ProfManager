@@ -11,40 +11,60 @@ const AjouterClasse = () => {
   const [cycleProf, setCycleProf] = useState(null);
   const [formData, setFormData] = useState({ nom: "", niveau_id: "" });
   const [selectedFile, setSelectedFile] = useState(null);
-  const isAr = i18n.language === "ar";
+  const [loading, setLoading] = useState(false);
+
+  // Normalisation stricte de la langue : "ar" ou "fr"
+  const langActive = (i18n.language || "fr").toLowerCase().startsWith("ar") ? "ar" : "fr";
+  const isAr = langActive === "ar";
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
-        const profRes = await api.get("professeur/me", {
-          headers,
-        });
-        setCycleProf(profRes.data.cycle_id);
-        const resNiveaux = await api.get(
-          `niveaux/?lang=${i18n.language}`,
-          { headers },
-        );
-        setNiveaux(
-          resNiveaux.data.filter((n) => n.cycle_id === profRes.data.cycle_id),
-        );
+
+        // 1. Récupération des informations de l'enseignant connecté
+        const profRes = await api.get("professeur/me", { headers });
+        const userCycleId = profRes.data?.cycle_id;
+        setCycleProf(userCycleId);
+
+        // 2. Récupération des niveaux avec la langue normalisée
+        const resNiveaux = await api.get(`niveaux/?lang=${langActive}`, { headers });
+        const dataNiveaux = Array.isArray(resNiveaux.data) ? resNiveaux.data : [];
+
+        // 3. Filtrage selon le cycle
+        if (userCycleId) {
+          const filtered = dataNiveaux.filter((n) => n.cycle_id === userCycleId);
+          setNiveaux(filtered.length > 0 ? filtered : dataNiveaux);
+        } else {
+          setNiveaux(dataNiveaux);
+        }
       } catch (err) {
-        console.error(err);
+        console.error("Erreur lors de l'initialisation des données :", err);
       }
     };
     fetchData();
-  }, [i18n.language]);
+  }, [langActive]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedFile)
+    if (!selectedFile) {
       return alert(isAr ? "الرجاء اختيار ملف" : "Veuillez choisir un fichier");
+    }
+
+    if (!formData.niveau_id) {
+      return alert(isAr ? "الرجاء اختيار المستوى" : "Veuillez choisir un niveau");
+    }
+
+    setLoading(true);
     const data = new FormData();
-    data.append("nom", formData.nom);
+    data.append("nom", formData.nom.trim());
     data.append("niveau_id", formData.niveau_id);
-    data.append("cycle_id", cycleProf);
+    if (cycleProf) {
+      data.append("cycle_id", cycleProf);
+    }
     data.append("file", selectedFile);
+
     try {
       const token = localStorage.getItem("token");
       await api.post("classes/", data, {
@@ -54,8 +74,20 @@ const AjouterClasse = () => {
         },
       });
       navigate("/classes");
-    } catch {
-      alert("Erreur");
+    } catch (err) {
+      console.error("Erreur lors de l'ajout de la classe :", err);
+
+      // Récupération du message d'erreur précis renvoyé par FastAPI (HTTP 400)
+      let errorMsg = isAr ? "حدث خطأ أثناء إضافة القسم" : "Erreur lors de l'ajout de la classe";
+      if (err.response && err.response.data && err.response.data.detail) {
+        errorMsg = typeof err.response.data.detail === "string" 
+          ? err.response.data.detail 
+          : JSON.stringify(err.response.data.detail);
+      }
+
+      alert(`${isAr ? "خطأ" : "Erreur"} : ${errorMsg}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,7 +99,7 @@ const AjouterClasse = () => {
         </h1>
 
         <form onSubmit={handleSubmit} className="ac-form">
-          {/* Nom */}
+          {/* Nom de la classe */}
           <div>
             <label className="ac-label">
               {isAr ? "اسم القسم" : "Nom de la classe"}
@@ -77,18 +109,20 @@ const AjouterClasse = () => {
               className="ac-input"
               required
               placeholder={isAr ? "مثال: 3أ" : "Ex: 3A"}
+              value={formData.nom}
               onChange={(e) =>
                 setFormData({ ...formData, nom: e.target.value })
               }
             />
           </div>
 
-          {/* Niveau */}
+          {/* Sélection du niveau */}
           <div>
             <label className="ac-label">{isAr ? "المستوى" : "Niveau"}</label>
             <select
               className="ac-input"
               required
+              value={formData.niveau_id}
               onChange={(e) =>
                 setFormData({ ...formData, niveau_id: e.target.value })
               }
@@ -104,7 +138,7 @@ const AjouterClasse = () => {
             </select>
           </div>
 
-          {/* File upload */}
+          {/* Import du fichier Excel */}
           <div>
             <label className="ac-label">
               {isAr ? "ملف التلاميذ (Excel)" : "Fichier étudiants (Excel)"}
@@ -131,17 +165,24 @@ const AjouterClasse = () => {
             </label>
           </div>
 
-          {/* Actions */}
+          {/* Boutons d'action */}
           <div className="ac-footer">
             <button
               type="button"
               className="ac-btn-cancel"
+              disabled={loading}
               onClick={() => navigate("/classes")}
             >
               {isAr ? "إلغاء" : "Annuler"}
             </button>
-            <button type="submit" className="ac-btn-submit">
-              {isAr ? "إضافة" : "Ajouter"}
+            <button type="submit" className="ac-btn-submit" disabled={loading}>
+              {loading
+                ? isAr
+                  ? "جاري الإضافة..."
+                  : "Ajout en cours..."
+                : isAr
+                  ? "إضافة"
+                  : "Ajouter"}
             </button>
           </div>
         </form>
