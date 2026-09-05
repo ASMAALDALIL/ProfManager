@@ -10,10 +10,12 @@ const Login = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const isAr = i18n.language?.startsWith("ar");
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const cleanLang = i18n.language?.startsWith("ar") ? "ar" : "fr";
+      const cleanLang = isAr ? "ar" : "fr";
       const res = await api.post(
         "auth/login",
         { email, mot_de_passe: password },
@@ -42,13 +44,13 @@ const Login = ({ setIsAuthenticated }) => {
 
         <h1 className="login-title">ProfManager</h1>
         <p className="login-subtitle">
-          {i18n.language?.startsWith("ar") ? "تسجيل الدخول" : "Connexion"}
+          {isAr ? "تسجيل الدخول" : "Connexion"}
         </p>
 
         <form
           onSubmit={handleLogin}
           className="login-form"
-          dir={i18n.language?.startsWith("ar") ? "rtl" : "ltr"}
+          dir={isAr ? "rtl" : "ltr"}
         >
           <div className="login-field-wrapper">
             <input
@@ -97,6 +99,39 @@ const Login = ({ setIsAuthenticated }) => {
             {t("link_register")}
           </span>
         </p>
+
+        {/* Liens obligatoires pour Google AdSense */}
+        <div
+          style={{
+            marginTop: "1.2rem",
+            fontSize: "0.75rem",
+            textAlign: "center",
+            opacity: 0.7,
+          }}
+          dir={isAr ? "rtl" : "ltr"}
+        >
+          <span
+            onClick={() => navigate("/privacy-policy")}
+            style={{
+              cursor: "pointer",
+              textDecoration: "underline",
+              margin: "0 6px",
+            }}
+          >
+            {isAr ? "سياسة الخصوصية" : "Politique de confidentialité"}
+          </span>
+          |
+          <span
+            onClick={() => navigate("/terms")}
+            style={{
+              cursor: "pointer",
+              textDecoration: "underline",
+              margin: "0 6px",
+            }}
+          >
+            {isAr ? "شروط الاستخدام" : "Conditions d'utilisation"}
+          </span>
+        </div>
       </div>
     </div>
   );
