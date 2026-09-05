@@ -18,13 +18,13 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 temp_db = {}
 
 conf = ConnectionConfig(
-    MAIL_USERNAME=os.getenv("MAIL_USERNAME", "ProfManager.service@gmail.com"),
-    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD", "uwzq xwuf zlkr chbv"),
-    MAIL_FROM=os.getenv("MAIL_USERNAME", "ProfManager.service@gmail.com"),
-    MAIL_PORT=587,
+    MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
+    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
+    MAIL_FROM=os.getenv("MAIL_USERNAME"),
+    MAIL_PORT=465,                    # Remplacer 587 par 465
     MAIL_SERVER="smtp.gmail.com",
-    MAIL_STARTTLS=True,
-    MAIL_SSL_TLS=False,
+    MAIL_STARTTLS=False,              # Passer à False
+    MAIL_SSL_TLS=True,                # Passer à True (SSL direct)
     USE_CREDENTIALS=True,
     VALIDATE_CERTS=True
 )
