@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import api from "../api/api";
 import { useTranslation } from "react-i18next";
 import "./styles/Profile.css";
@@ -30,30 +30,35 @@ const Profile = () => {
     confirm: "",
   });
 
-  // isAr is read live from i18n so labels switch language,
-  // but fetchData is called only once on mount — data stays stable.
   const isAr = i18n.language === "ar";
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
-      const profRes = await api.get("professeur/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const headers = { 
+        Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache"
+      };
+
+      const profRes = await api.get(`professeur/me?_t=${Date.now()}`, { headers });
       setUserData(profRes.data);
       setFormData({
-        nom: profRes.data.nom,
-        prenom: profRes.data.prenom,
-        email: profRes.data.email,
-        telephone: profRes.data.telephone,
+        nom: profRes.data.nom || "",
+        prenom: profRes.data.prenom || "",
+        email: profRes.data.email || "",
+        telephone: profRes.data.telephone || "",
         cycle_id: profRes.data.cycle_id || "",
       });
 
-      // Always fetch both languages so the cycle display is bilingual
+      // Synchronisation avec le localStorage pour l'application globale
+      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      localStorage.setItem("user", JSON.stringify({ ...storedUser, ...profRes.data }));
+
       const [resFr, resAr] = await Promise.all([
-        api.get("cycles/?lang=fr"),
-        api.get("cycles/?lang=ar"),
+        api.get(`cycles/?lang=fr&_t=${Date.now()}`),
+        api.get(`cycles/?lang=ar&_t=${Date.now()}`),
       ]);
+      
       setCyclesList(
         resFr.data.map((f) => ({
           id: f.id,
@@ -63,9 +68,7 @@ const Profile = () => {
       );
 
       if (profRes.data.cycle_id) {
-        const cycleDetails = await api.get(
-          `cycles/${profRes.data.cycle_id}`,
-        );
+        const cycleDetails = await api.get(`cycles/${profRes.data.cycle_id}`);
         setCycleNames({
           fr: formatText(cycleDetails.data.fr),
           ar: cycleDetails.data.ar || "---",
@@ -74,24 +77,33 @@ const Profile = () => {
     } catch (err) {
       console.error("Erreur API:", err);
     }
-  };
+  }, []);
 
-  // Fetch only on mount — NOT on language change
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await api.put("professeur/me", formData, {
+      const res = await api.put("professeur/me", formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
+      // 1. Mettre à jour immédiatement l'affichage local avec la réponse du backend
+      const updatedData = res.data || formData;
+      setUserData(updatedData);
+
+      // 2. Mettre à jour le cache local
+      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      localStorage.setItem("user", JSON.stringify({ ...storedUser, ...updatedData }));
+
       setIsEditing(false);
-      fetchData();
+      await fetchData();
+      alert(isAr ? "تم تحديث الملف الشخصي بنجاح" : "Profil mis à jour avec succès !");
     } catch {
-      alert("Erreur lors de la mise à jour");
+      alert(isAr ? "خطأ في التحديث" : "Erreur lors de la mise à jour");
     }
   };
 
@@ -292,7 +304,7 @@ const Profile = () => {
             )}
           </div>
 
-          {/* Footer buttons — centered */}
+          {/* Footer buttons */}
           <div className="pf-footer">
             {isEditing ? (
               <>
