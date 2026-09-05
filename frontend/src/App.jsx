@@ -26,6 +26,8 @@ import HistoriqueEtudiant from "./pages/HistoriqueEtudiant";
 import CalculateurNotes from "./pages/CalculateurNotes";
 import Dashboard from "./pages/Dashboard";
 import "./App.css";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Terms from "./pages/Terms";
 
 const SIDEBAR_W = 260;
 const TOPBAR_H = 56;
@@ -543,6 +545,8 @@ function AppContent() {
             }
           />
           <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+<Route path="/terms" element={<Terms />} />
         </Routes>
       </div>
     </div>
