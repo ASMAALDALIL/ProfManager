@@ -39,13 +39,11 @@ const Register = () => {
     fetchCycles();
   }, [i18n.language]);
 
-  // Passage direct à la saisie du mot de passe
   const handleNextStep = (e) => {
     e.preventDefault();
     setStep(2);
   };
 
-  // Inscription directe sans code
   const handleFinalRegister = async (e) => {
     e.preventDefault();
 
@@ -81,7 +79,6 @@ const Register = () => {
       <div className="register-card">
         <h1 className="register-title">ProfManager</h1>
 
-        {/* Barre de progression simplifiée en 2 étapes */}
         <div className="register-steps" style={{ marginBottom: "1.75rem" }}>
           <div className={`register-step-dot ${stepStatus(1)}`}>1</div>
           <div className={`register-step-line ${lineStatus(1)}`} />
@@ -186,7 +183,11 @@ const Register = () => {
               <button
                 type="button"
                 className="register-btn"
-                style={{ background: "transparent", border: "1px solid #ccc", marginTop: "0.5rem" }}
+                style={{
+                  background: "transparent",
+                  border: "1px solid #ccc",
+                  marginTop: "0.5rem",
+                }}
                 onClick={() => setStep(1)}
               >
                 {isAr ? "رجوع" : "Retour"}
@@ -201,6 +202,39 @@ const Register = () => {
             {isAr ? "تسجيل الدخول" : "Se connecter"}
           </span>
         </p>
+
+        {/* Liens obligatoires pour Google AdSense */}
+        <div
+          style={{
+            marginTop: "1.2rem",
+            fontSize: "0.75rem",
+            textAlign: "center",
+            opacity: 0.7,
+          }}
+          dir={isAr ? "rtl" : "ltr"}
+        >
+          <span
+            onClick={() => navigate("/privacy-policy")}
+            style={{
+              cursor: "pointer",
+              textDecoration: "underline",
+              margin: "0 6px",
+            }}
+          >
+            {isAr ? "سياسة الخصوصية" : "Politique de confidentialité"}
+          </span>
+          |
+          <span
+            onClick={() => navigate("/terms")}
+            style={{
+              cursor: "pointer",
+              textDecoration: "underline",
+              margin: "0 6px",
+            }}
+          >
+            {isAr ? "شروط الاستخدام" : "Conditions d'utilisation"}
+          </span>
+        </div>
       </div>
     </div>
   );
