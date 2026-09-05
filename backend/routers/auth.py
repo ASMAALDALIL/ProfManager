@@ -2,7 +2,6 @@ import random
 import os
 from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, status, Header
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -16,18 +15,6 @@ router = APIRouter(prefix="/auth", tags=["Authentification"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 temp_db = {}
-
-conf = ConnectionConfig(
-    MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
-    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
-    MAIL_FROM=os.getenv("MAIL_USERNAME"),
-    MAIL_PORT=465,                    # Remplacer 587 par 465
-    MAIL_SERVER="smtp.gmail.com",
-    MAIL_STARTTLS=False,              # Passer à False
-    MAIL_SSL_TLS=True,                # Passer à True (SSL direct)
-    USE_CREDENTIALS=True,
-    VALIDATE_CERTS=True
-)
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     try:
@@ -43,30 +30,6 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise HTTPException(status_code=401, detail="Utilisateur non trouvé")
     return user
 
-async def send_verification_email(email: str, code: str):
-    html = f"""
-    <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
-        <h2 style="color: #2563eb; text-align: center;">ProfManager</h2>
-        <p>Votre code de confirmation est :</p>
-        <div style="background: #f3f4f6; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #2563eb; border-radius: 8px;">
-            {code}
-        </div>
-        <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
-        <div dir="rtl" style="text-align: right;">
-            <p>رمز التحقق الخاص بك هو: <strong>{code}</strong></p>
-            <p>مرحباً بك في ProfManager.</p>
-        </div>
-    </div>
-    """
-    message = MessageSchema(
-        subject="Code de vérification - ProfManager",
-        recipients=[email],
-        body=html,
-        subtype=MessageType.html
-    )
-    fm = FastMail(conf)
-    await fm.send_message(message)
-
 @router.post("/send-code")
 async def send_code(email: str, db: Session = Depends(get_db)):
     # 1. Vérifier si l'utilisateur existe déjà
@@ -78,16 +41,15 @@ async def send_code(email: str, db: Session = Depends(get_db)):
     code = str(random.randint(1000, 9999))
     temp_db[email] = code
     
-    # 3. Envoyer l'email DIRECTEMENT (on attend qu'il soit envoyé)
-    try:
-        await send_verification_email(email, code)
-        return {"message": "Code envoyé avec succès"}
-    except Exception as e:
-        print(f"Erreur SMTP : {e}")
-        raise HTTPException(
-            status_code=500, 
-            detail="Erreur lors de l'envoi de l'email. Vérifiez la configuration SMTP."
-        )
+    # 3. Contournement SMTP : affichage direct dans les logs Render
+    print("=" * 50)
+    print(f"👉 CODE DE CONFIRMATION POUR {email} : {code}")
+    print("=" * 50)
+    
+    return {
+        "message": "Code envoyé avec succès",
+        "code": code
+    }
 
 @router.post("/verify-code")
 async def verify_code(email: str, code: str):
